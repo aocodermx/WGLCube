@@ -5,38 +5,49 @@
     <title>Test control usage</title>
     <link rel="stylesheet" href="css/main.css" />
   </head>
-  <body>
+    <div id="cube"></div>
+  <body onload="setupWebGL();">
     <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.js"></script>
     <script>
-      var N = 1;
-      var I = -1;
       var cubeSize = 3;
-      var layers = new Array();
+      var cameraPosition = cubeSize * 1.4;
+
       var scene  = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-      camera.position.set(15,15,15);
-      camera.rotation.z += 10;
-      camera.lookAt(scene.position);
+      var camera = new THREE.PerspectiveCamera( 45, document.getElementById("cube").offsetWidth / document.getElementById("cube").offsetHeight, 0.1, 1000 );
+      var renderer = window.WebGLRenderingContext ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
 
-      var renderer = new THREE.WebGLRenderer();
-      renderer.setSize( window.innerWidth, window.innerHeight );
-      renderer.setClearColor(0xCCCCCC, 1);
-      document.body.appendChild( renderer.domElement );
+      var deg2rad = function(degrees){return degrees*(Math.PI/180);}
 
+      function setupWebGL(){
+        camera.position.addScalar(cameraPosition);
+        renderer.setClearColor(0xDDDDDD, 1);
+        renderer.setSize( document.getElementById("cube").offsetWidth, document.getElementById("cube").offsetHeight );
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        document.getElementById("cube").appendChild(renderer.domElement);
 
+        // Temporal grid
+        var gridXY = new THREE.GridHelper(cubeSize, 1);
+        gridXY.rotation.x = Math.PI/2;
+        gridXY.setColors( new THREE.Color(0x000066), new THREE.Color(0x000066) );
+        scene.add(gridXY);
 
-      var gridXY = new THREE.GridHelper(100, 1);
-      gridXY.position.set( 100,100,0 );
-      gridXY.rotation.x = Math.PI/2;
-      gridXY.setColors( new THREE.Color(0x000066), new THREE.Color(0x000066) );
-      scene.add(gridXY);
+        window.addEventListener('resize', function() {
+          var WIDTH = document.getElementById("cube").offsetWidth,
+          HEIGHT = document.getElementById("cube").offsetHeight;
+          renderer.setSize(WIDTH, HEIGHT);
+          camera.aspect = WIDTH / HEIGHT;
+          camera.updateProjectionMatrix();
+        });
 
+        renderCube(scene);
 
+        /* Testing animaiton options */
 
-      createCube(scene);
-      render();
+        runGL();
+      }
 
-      function createCube(scene){
+      function renderCube(scene){
         var geometry = new THREE.BoxGeometry( 0.99, 0.99, 0.99 );
         var material = new THREE.MeshFaceMaterial( [
           new THREE.MeshBasicMaterial({color:0xFF0000}), // Left   -> Red
@@ -47,52 +58,21 @@
           new THREE.MeshBasicMaterial({color:0xFFFF00})  // Back   -> Yellow
           ] );
 
-        var planeGeometry = new THREE.PlaneBufferGeometry(3, 3);
-        var planeMaterial = new THREE.MeshNormalMaterial();
-
-        for(var z=0; z<cubeSize; z++){
-          layers[z] = new THREE.Mesh(planeGeometry, planeMaterial);
-          layers[z].position.x += 1.5;
-          layers[z].position.y += 1.5;
-          layers[z].position.z += z * 1 + 0.5;
-          for(var x=0; x<cubeSize; x++){
-            for(var y=0; y<cubeSize; y++){
+        for(var z=-cubeSize/2; z<cubeSize/2; z++){
+          for(var x=-cubeSize/2; x<cubeSize/2; x++){
+            for(var y=-cubeSize/2; y<cubeSize/2; y++){
               var piece = new THREE.Mesh(geometry, material);
-              piece.position.x = x - 1;
-              piece.position.y = y - 1;
-              //piece.position.z = z * 1.02;
-              layers[z].add(piece);
+              piece.position.set(x + 0.5, y + 0.5, z + 0.5);
+              scene.add(piece);
             }
           }
-          scene.add(layers[z]);
         }
       }
 
-      function U(direction){
-        for (var i = 0; i < 9; i++) {
-          layers[0].rotation.z += deg2rad(10*direction);
-        }
-      }
-
-      function M(direction){
-        for (var i = 0; i < 9; i++) {
-          layers[1].rotation.z += deg2rad(10*direction);
-        }
-      }
-
-      function D(direction){
-        for (var i = 0; i < 9; i++) {
-          layers[2].rotation.z += deg2rad(1*direction);
-        }
-      }
-
-      function render() {
-        requestAnimationFrame( render );
+      function runGL() {
+        requestAnimationFrame( runGL );
         renderer.render( scene, camera );
-      }
-
-      function deg2rad(degrees){
-        return degrees*(Math.PI/180);
+        controls.update();
       }
     </script>
   </body>
