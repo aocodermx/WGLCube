@@ -5,13 +5,14 @@
     <title>Test control usage</title>
     <link rel="stylesheet" href="css/main.css" />
   </head>
-    <div id="cube"></div>
   <body onload="setupWebGL();">
+    <div id="cube"></div>
     <script src="js/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script>
       var cubeSize = 3;
       var cameraPosition = cubeSize * 1.4;
+      var cubeArray = Array();
 
       var scene  = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera( 45, document.getElementById("cube").offsetWidth / document.getElementById("cube").offsetHeight, 0.1, 1000 );
@@ -41,30 +42,109 @@
         });
 
         renderCube(scene);
-
-        /* Testing animaiton options */
-
         runGL();
       }
 
       function renderCube(scene){
         var geometry = new THREE.BoxGeometry( 0.99, 0.99, 0.99 );
         var material = new THREE.MeshFaceMaterial( [
-          new THREE.MeshBasicMaterial({color:0xFF0000}), // Left   -> Red
           new THREE.MeshBasicMaterial({color:0xFF6600}), // Right  -> Orange
+          new THREE.MeshBasicMaterial({color:0xFF0000}), // Left   -> Red
           new THREE.MeshBasicMaterial({color:0x00FF00}), // Top    -> Green
           new THREE.MeshBasicMaterial({color:0x0000FF}), // Bottom -> Blue
           new THREE.MeshBasicMaterial({color:0xFFFFFF}), // Front  -> White
           new THREE.MeshBasicMaterial({color:0xFFFF00})  // Back   -> Yellow
           ] );
 
-        for(var z=-cubeSize/2; z<cubeSize/2; z++){
-          for(var x=-cubeSize/2; x<cubeSize/2; x++){
-            for(var y=-cubeSize/2; y<cubeSize/2; y++){
+        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
+          cubeArray[z] = Array();
+          for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+            cubeArray[z][x] = Array();
+            for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
               var piece = new THREE.Mesh(geometry, material);
-              piece.position.set(x + 0.5, y + 0.5, z + 0.5);
+              piece.position.set(x, y, z);
+              cubeArray[z][x][y] = piece;
               scene.add(piece);
             }
+          }
+        }
+      }
+
+
+      var xContainer = new THREE.Object3D();
+      scene.add(xContainer);
+
+      function moveX(level, direction){
+        level = level - cubeSize/2 + 0.5;
+        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
+          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
+            xContainer.add(cubeArray[z][level][y]);
+          }
+        }
+        xContainer.rotation.x = direction*deg2rad(90);
+        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
+          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
+            newpos = cubeArray[z][level][y].getWorldPosition().clone();
+            newrot = cubeArray[z][level][y].getWorldRotation().clone();
+            xContainer.remove(cubeArray[z][level][y]);
+            cubeArray[z][level][y].position.copy(newpos);
+            cubeArray[z][level][y].rotation.copy(newrot);
+            scene.add(cubeArray[z][level][y]);
+
+            //console.log(level, newpos.x, newpos.y);
+          }
+        }
+      }
+
+      var yContainer = new THREE.Object3D();
+      scene.add(yContainer);
+
+      function moveY(level, direction){
+        level = level - cubeSize/2 + 0.5;
+        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
+          for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+            yContainer.add(cubeArray[z][x][level]);
+          }
+        }
+        yContainer.rotation.y = direction*deg2rad(90);
+        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
+          for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+            newpos = cubeArray[z][x][level].getWorldPosition().clone();
+            newrot = cubeArray[z][x][level].getWorldRotation().clone();
+            yContainer.remove(cubeArray[z][x][level]);
+            cubeArray[z][x][level].position.copy(newpos);
+            cubeArray[z][x][level].rotation.copy(newrot);
+            scene.add(cubeArray[z][x][level]);
+
+            //console.log(newpos.x, level, newpos.z);
+          }
+        }
+      }
+
+      var zContainer = new THREE.Object3D();
+      scene.add(zContainer);
+
+      function moveZ(level, direction){
+        level = level - cubeSize/2 + 0.5;
+        for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
+            zContainer.add(cubeArray[level][x][y]);
+          }
+        }
+        zContainer.rotation.z = direction*deg2rad(90);
+        for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
+            newpos = cubeArray[level][x][y].getWorldPosition().clone();
+            newrot = cubeArray[level][x][y].getWorldRotation().clone();
+            zContainer.remove(cubeArray[level][x][y]);
+            cubeArray[level][x][y].position.copy(newpos);
+            cubeArray[level][x][y].rotation.copy(newrot);
+            scene.add(cubeArray[level][x][y]);
+
+            //console.log(x, y, " to ", Math.round(newpos.x), Math.round(newpos.y) );
+            //tmpmesh = cubeArray[level][Math.round(newpos.x)][Math.round(newpos.y)];
+            //cubeArray[level][Math.round(newpos.x)][Math.round(newpos.y)] = cubeArray[level][x][y];
+            //cubeArray[level][x][y] = tmpmesh;
           }
         }
       }
