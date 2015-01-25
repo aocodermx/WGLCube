@@ -9,6 +9,7 @@
     <div id="cube"></div>
     <script src="js/three.min.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/SceneUtils.js"></script>
     <script>
       var cubeSize = 3;
       var cameraPosition = cubeSize * 1.4;
@@ -20,12 +21,20 @@
 
       var deg2rad = function(degrees){return degrees*(Math.PI/180);}
 
+      var xContainer = new THREE.Object3D();
+      var yContainer = new THREE.Object3D();
+      var zContainer = new THREE.Object3D();
+
       function setupWebGL(){
         camera.position.addScalar(cameraPosition);
         renderer.setClearColor(0xDDDDDD, 1);
         renderer.setSize( document.getElementById("cube").offsetWidth, document.getElementById("cube").offsetHeight );
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         document.getElementById("cube").appendChild(renderer.domElement);
+
+        scene.add(xContainer);
+        scene.add(yContainer);
+        scene.add(zContainer);
 
         // Temporal grid
         var gridXY = new THREE.GridHelper(cubeSize, 1);
@@ -68,11 +77,20 @@
             }
           }
         }
+        // Higlight centers
+        cubeArray[1][0][0].scale.setZ(1.2);
+        cubeArray[0][1][0].scale.setX(1.2);
+        cubeArray[0][0][1].scale.setY(1.2);
+        cubeArray[-1][0][0].scale.setZ(1.2);
+        cubeArray[0][-1][0].scale.setX(1.2);
+        cubeArray[0][0][-1].scale.setY(1.2);
+        // Nedded for unknown reasons.
+        xContainer.rotation.x = deg2rad(90);
+        yContainer.rotation.y = deg2rad(90);
+        zContainer.rotation.z = deg2rad(90);
       }
 
 
-      var xContainer = new THREE.Object3D();
-      scene.add(xContainer);
 
       function moveX(level, direction){
         level = level - cubeSize/2 + 0.5;
@@ -90,14 +108,10 @@
             cubeArray[z][level][y].position.copy(newpos);
             cubeArray[z][level][y].rotation.copy(newrot);
             scene.add(cubeArray[z][level][y]);
-
-            //console.log(level, newpos.x, newpos.y);
           }
         }
       }
 
-      var yContainer = new THREE.Object3D();
-      scene.add(yContainer);
 
       function moveY(level, direction){
         level = level - cubeSize/2 + 0.5;
@@ -115,38 +129,37 @@
             cubeArray[z][x][level].position.copy(newpos);
             cubeArray[z][x][level].rotation.copy(newrot);
             scene.add(cubeArray[z][x][level]);
-
-            //console.log(newpos.x, level, newpos.z);
           }
         }
       }
 
-      var zContainer = new THREE.Object3D();
-      scene.add(zContainer);
-
       function moveZ(level, direction){
         level = level - cubeSize/2 + 0.5;
+        tmpArray = new Array();
         for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
+          tmpArray[x] = new Array();
           for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            zContainer.add(cubeArray[level][x][y]);
+            tmpArray[x][y] = cubeArray[level][x][y].clone();
+            zContainer.add(tmpArray[x][y]);
+            zContainer.remove(cubeArray[level][x][y]);
           }
         }
         zContainer.rotation.z = direction*deg2rad(90);
         for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
           for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            newpos = cubeArray[level][x][y].getWorldPosition().clone();
-            newrot = cubeArray[level][x][y].getWorldRotation().clone();
-            zContainer.remove(cubeArray[level][x][y]);
-            cubeArray[level][x][y].position.copy(newpos);
-            cubeArray[level][x][y].rotation.copy(newrot);
-            scene.add(cubeArray[level][x][y]);
-
-            //console.log(x, y, " to ", Math.round(newpos.x), Math.round(newpos.y) );
-            //tmpmesh = cubeArray[level][Math.round(newpos.x)][Math.round(newpos.y)];
-            //cubeArray[level][Math.round(newpos.x)][Math.round(newpos.y)] = cubeArray[level][x][y];
-            //cubeArray[level][x][y] = tmpmesh;
+            newpos = tmpArray[x][y].getWorldPosition().clone();
+            newrot = tmpArray[x][y].getWorldRotation().clone();
+            zContainer.remove(tmpArray[x][y]);
+            tmpArray[x][y].position.copy(newpos);
+            tmpArray[x][y].rotation.copy(newrot);
+            scene.add(tmpArray[x][y]);
+            cubeArray[level][x][y] = tmpArray[Math.round(newpos.x)][Math.round(newpos.y)];
           }
         }
+      }
+
+      function rotatePoint(x, y, direction){
+        return [(-y * direction), x * direction];
       }
 
       function runGL() {
