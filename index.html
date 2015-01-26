@@ -14,6 +14,7 @@
       var cubeSize = 3;
       var cameraPosition = cubeSize * 1.4;
       var cubeArray = Array();
+      var core = new THREE.Object3D();
 
       var scene  = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera( 45, document.getElementById("cube").offsetWidth / document.getElementById("cube").offsetHeight, 0.1, 1000 );
@@ -21,26 +22,12 @@
 
       var deg2rad = function(degrees){return degrees*(Math.PI/180);}
 
-      var xContainer = new THREE.Object3D();
-      var yContainer = new THREE.Object3D();
-      var zContainer = new THREE.Object3D();
-
       function setupWebGL(){
         camera.position.addScalar(cameraPosition);
         renderer.setClearColor(0xDDDDDD, 1);
         renderer.setSize( document.getElementById("cube").offsetWidth, document.getElementById("cube").offsetHeight );
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         document.getElementById("cube").appendChild(renderer.domElement);
-
-        scene.add(xContainer);
-        scene.add(yContainer);
-        scene.add(zContainer);
-
-        // Temporal grid
-        var gridXY = new THREE.GridHelper(cubeSize, 1);
-        gridXY.rotation.x = Math.PI/2;
-        gridXY.setColors( new THREE.Color(0x000066), new THREE.Color(0x000066) );
-        scene.add(gridXY);
 
         window.addEventListener('resize', function() {
           var WIDTH = document.getElementById("cube").offsetWidth,
@@ -66,100 +53,101 @@
           ] );
 
         for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
-          cubeArray[z] = Array();
           for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
-            cubeArray[z][x] = Array();
             for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
               var piece = new THREE.Mesh(geometry, material);
               piece.position.set(x, y, z);
-              cubeArray[z][x][y] = piece;
+              cubeArray.push(piece);
               scene.add(piece);
             }
           }
         }
-        // Higlight centers
-        cubeArray[1][0][0].scale.setZ(1.2);
-        cubeArray[0][1][0].scale.setX(1.2);
-        cubeArray[0][0][1].scale.setY(1.2);
-        cubeArray[-1][0][0].scale.setZ(1.2);
-        cubeArray[0][-1][0].scale.setX(1.2);
-        cubeArray[0][0][-1].scale.setY(1.2);
-        // Nedded for unknown reasons.
-        xContainer.rotation.x = deg2rad(90);
-        yContainer.rotation.y = deg2rad(90);
-        zContainer.rotation.z = deg2rad(90);
+        // Core point for rotations
+        core.position.set(0,0,0);
+        scene.add(core);
       }
 
-
-
-      function moveX(level, direction){
-        level = level - cubeSize/2 + 0.5;
-        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
-          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            xContainer.add(cubeArray[z][level][y]);
+      function moveOnAxis(axis, level, direction){
+        var level = level - cubeSize/2 + 0.5;
+        // validate axis in x,y,z
+        if(axis != "x" && axis != "y" && axis != "z")
+          return -1;
+        for (var b=0; b<cubeArray.length; b++){
+          if(Math.round(cubeArray[b].getWorldPosition()[axis]) === level ){
+            THREE.SceneUtils.attach(cubeArray[b], scene, core);
+          } else {
+            console.log("level: ", level, "Position: ", Math.round(cubeArray[b].getWorldPosition()[axis]));
           }
         }
-        xContainer.rotation.x = direction*deg2rad(90);
-        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
-          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            newpos = cubeArray[z][level][y].getWorldPosition().clone();
-            newrot = cubeArray[z][level][y].getWorldRotation().clone();
-            xContainer.remove(cubeArray[z][level][y]);
-            cubeArray[z][level][y].position.copy(newpos);
-            cubeArray[z][level][y].rotation.copy(newrot);
-            scene.add(cubeArray[z][level][y]);
+
+        switch(axis){
+          case "x":
+            core.rotation.x += direction*deg2rad(90);
+            break;
+          case "y":
+            core.rotation.y += direction*deg2rad(90);
+            break;
+          case "z":
+            core.rotation.z += direction*deg2rad(90);
+            break;
+        }
+        core.updateMatrixWorld();
+        for (var b=0; b<cubeArray.length; b++){
+          if(Math.round(cubeArray[b].getWorldPosition()[axis]) === level){
+            THREE.SceneUtils.detach(cubeArray[b], core, scene);
+          } else {
+            console.log("level: ", level, "Position: ", Math.round(cubeArray[b].getWorldPosition()[axis]));
           }
         }
+
+        console.log("Scene:", scene.children.length);
+        console.log("Core :", core.children.length);
       }
 
-
-      function moveY(level, direction){
-        level = level - cubeSize/2 + 0.5;
-        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
-          for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
-            yContainer.add(cubeArray[z][x][level]);
+      function moveString(steps){
+        for (var step in steps){
+          switch(steps[step]){
+            case "L":
+              moveOnAxis("x", 0, 1);
+              break;
+            case "l":
+              moveOnAxis("x", 0,-1);
+              break;
+            case "R":
+              moveOnAxis("x", 2,-1);
+              break;
+            case "r":
+              moveOnAxis("x", 2, 1);
+              break;
+            case "U":
+              moveOnAxis("y", 2,-1);
+              break;
+            case "u":
+              moveOnAxis("y", 2, 1);
+              break;
+            case "D":
+              moveOnAxis("y", 0, 1);
+              break;
+            case "d":
+              moveOnAxis("y", 0,-1);
+              break;
+            case "F":
+              moveOnAxis("z", 2,-1);
+              break;
+            case "f":
+              moveOnAxis("z", 2, 1);
+              break;
+            case "B":
+              moveOnAxis("z", 0, 1);
+              break;
+            case "b":
+              moveOnAxis("z", 0,-1);
+              break;
+            default:
+              console.log("Invalid character", steps[step]);
+              return -1;
           }
         }
-        yContainer.rotation.y = direction*deg2rad(90);
-        for(var z=-cubeSize/2 + 0.5; z<cubeSize/2; z++){
-          for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
-            newpos = cubeArray[z][x][level].getWorldPosition().clone();
-            newrot = cubeArray[z][x][level].getWorldRotation().clone();
-            yContainer.remove(cubeArray[z][x][level]);
-            cubeArray[z][x][level].position.copy(newpos);
-            cubeArray[z][x][level].rotation.copy(newrot);
-            scene.add(cubeArray[z][x][level]);
-          }
-        }
-      }
-
-      function moveZ(level, direction){
-        level = level - cubeSize/2 + 0.5;
-        tmpArray = new Array();
-        for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
-          tmpArray[x] = new Array();
-          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            tmpArray[x][y] = cubeArray[level][x][y].clone();
-            zContainer.add(tmpArray[x][y]);
-            zContainer.remove(cubeArray[level][x][y]);
-          }
-        }
-        zContainer.rotation.z = direction*deg2rad(90);
-        for(var x=-cubeSize/2 + 0.5; x<cubeSize/2; x++){
-          for(var y=-cubeSize/2 + 0.5; y<cubeSize/2; y++){
-            newpos = tmpArray[x][y].getWorldPosition().clone();
-            newrot = tmpArray[x][y].getWorldRotation().clone();
-            zContainer.remove(tmpArray[x][y]);
-            tmpArray[x][y].position.copy(newpos);
-            tmpArray[x][y].rotation.copy(newrot);
-            scene.add(tmpArray[x][y]);
-            cubeArray[level][x][y] = tmpArray[Math.round(newpos.x)][Math.round(newpos.y)];
-          }
-        }
-      }
-
-      function rotatePoint(x, y, direction){
-        return [(-y * direction), x * direction];
       }
 
       function runGL() {
