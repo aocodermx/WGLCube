@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>rubikgl-web</title>
+    <link rel="stylesheet" href="style.css">
+    <style type="text/css">
+    body{
+      margin:0;
+      overflow:hidden;
+      text-align:center;
+      background:#DDD;
+    }
+    button{
+      height:1.5em;
+      width:15%;
+    }
+    #rubik-cube{
+      position:absolute;
+      top:0;
+      width:100%;
+      bottom:3em;
+    }
+    #rubik-steps{
+      position:absolute;
+      width:100%;
+      bottom:1.5em;
+      height:1.5em;
+    }
+    #rubik-controls{
+      position:absolute;
+      bottom:0;
+      width:100%;
+      height:1.5em;
+    }
+    </style>
+  </head>
+  <body onload="setupWebGL();">
+    <div id="rubik-control">
+      <div id="rubik-cube"></div>
+      <div id="rubik-steps">FUL</div>
+      <div id="rubik-controls">
+        <button class="icon-prev" name="prev"></button>
+        <button class="icon-play" name="play"></button>
+        <button class="icon-pause" name="pause"></button>
+        <button class="icon-next" name="next"></button>
+        <button class="icon-stop" name="stop">S</button>
+      </div>
+    </div>
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.min.js"></script>
+    <script src="js/SceneUtils.min.js"></script>
+    <script src="rubikgl-web.js"></script>
+  </body>
+</html>
