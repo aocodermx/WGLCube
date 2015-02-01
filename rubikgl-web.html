@@ -12,44 +12,54 @@
       background:#DDD;
     }
     button{
-      height:1.5em;
-      width:15%;
+      height:80%;
+      width:20%;
+      font-size:auto;
     }
     #rubik-cube{
       position:absolute;
-      top:0;
       width:100%;
-      bottom:3em;
+      bottom:30%;
+      top:0;
     }
-    #rubik-steps{
+    #rubik-steps-display{
       position:absolute;
       width:100%;
-      bottom:1.5em;
-      height:1.5em;
+      height:15%;
+      bottom:15%;
+      //background-color:red;
+    }
+    #rubik-steps-display p{
+      margin:0;
+      line-height:100%;
+      word-wrap:break-word;
     }
     #rubik-controls{
       position:absolute;
-      bottom:0;
       width:100%;
-      height:1.5em;
+      height:15%;
+      bottom:0;
+      //background-color:blue;
     }
     </style>
   </head>
   <body onload="setupWebGL();">
     <div id="rubik-control">
       <div id="rubik-cube"></div>
-      <div id="rubik-steps">FUL</div>
+      <div id="rubik-steps-display">
+        <p id="rubik-steps"></p>
+      </div>
       <div id="rubik-controls">
-        <button class="icon-prev" name="prev"></button>
-        <button class="icon-play" name="play"></button>
-        <button class="icon-pause" name="pause"></button>
+        <button class="icon-previous" name="prev"></button>
+        <button class="icon-play" name="pp"></button>
+        <button class="icon-stop" name="stop"></button>
         <button class="icon-next" name="next"></button>
-        <button class="icon-stop" name="stop">S</button>
       </div>
     </div>
     <script src="js/three.min.js"></script>
     <script src="js/OrbitControls.min.js"></script>
     <script src="js/SceneUtils.min.js"></script>
+    <script src="js/tween.min.js"></script>
     <script src="rubikgl-web.js"></script>
   </body>
 </html>

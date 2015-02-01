@@ -5,9 +5,35 @@
     <title>Test rubikgl-web</title>
   </head>
   <body>
-    <iframe width="200px" height="200px" src="rubikgl-web.html" frameborder="0" scrolling="no"></iframe>
-    <object width="200px" height="200px" data="rubikgl-web.html" frameborder="0" scrolling="no">
-      <param name="steps" value="FUR">
-    </object>
+
+    <iframe
+      width="200px"
+      height="200px"
+      data-start="FUF"
+      data-steps="ASDF"
+      src="rubikgl-web.html">
+    </iframe>
+
+    <iframe
+      width="300px"
+      height="300px"
+      data-start="*"
+      data-steps="ruf"
+      src="rubikgl-web.html">
+    </iframe>
+
+    <iframe
+      width="400px"
+      height="400px"
+      data-steps="ruf"
+      src="rubikgl-web.html">
+    </iframe>
+
+    <!-- NOT SUPPORTED ACTUALLY
+      <object width="200px" height="200px" data="rubikgl-web.html">
+        <param name="data-start" value="FUR">
+        <param name="data-steps" value="FUR">
+      </object>
+    -->
   </body>
 </html>

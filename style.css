@@ -1,10 +1,10 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url('fonts/icomoon.eot?-s8p9db');
-	src:url('fonts/icomoon.eot?#iefix-s8p9db') format('embedded-opentype'),
-		url('fonts/icomoon.woff?-s8p9db') format('woff'),
-		url('fonts/icomoon.ttf?-s8p9db') format('truetype'),
-		url('fonts/icomoon.svg?-s8p9db#icomoon') format('svg');
+	src:url('fonts/icomoon.eot?dnpt86');
+	src:url('fonts/icomoon.eot?#iefixdnpt86') format('embedded-opentype'),
+		url('fonts/icomoon.woff?dnpt86') format('woff'),
+		url('fonts/icomoon.ttf?dnpt86') format('truetype'),
+		url('fonts/icomoon.svg?dnpt86#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
@@ -23,27 +23,23 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.icon-next:before {
-	content: "\e600";
-}
-
-.icon-prev:before {
-	content: "\e601";
+.icon-play:before {
+	content: "\ea15";
 }
 
 .icon-pause:before {
-	content: "\e602";
+	content: "\ea16";
 }
 
-.icon-play:before {
-	content: "\e603";
+.icon-stop:before {
+	content: "\ea17";
 }
 
-.icon-mclose:before {
-	content: "\e9bf";
+.icon-previous:before {
+	content: "\ea18";
 }
 
-.icon-mopen:before {
-	content: "\e9c0";
+.icon-next:before {
+	content: "\ea19";
 }
 
