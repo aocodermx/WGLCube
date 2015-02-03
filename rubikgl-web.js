@@ -14,6 +14,20 @@ var cubeSize  = 3;
 var cubeArray = new Array();
 var scene     = new THREE.Scene();
 
+var movList   = new Array();
+var movPos = 0;
+
+var attachFace = false;
+var detachFace = false;
+var inMov = false;
+
+var movLayer   = "";
+var movAxis    = "";
+var movDegrees = "";
+var movTimes   = "";
+var core = "";
+var tween = "";
+
 function setupWebGL(){
   var renderer  = window.WebGLRenderingContext ? new THREE.WebGLRenderer({antialias:true}) : new THREE.CanvasRenderercamera();
   var container = document.getElementById("rubik-cube");
@@ -43,13 +57,22 @@ function setupWebGL(){
     var stepString = window.frameElement.getAttribute("data-steps");
     var rubikSteps = document.getElementById('rubik-steps');
     rubikSteps.innerHTML = stepString;
-    applySteps(initString);
+    parseSteps(initString);
   } else {
     // On Top
   }
 
   runGL(renderer, camera, controls);
 }
+
+var buttonPlay = document.getElementById("playpause");
+buttonPlay.onclick = function(){
+  if(movList.length !== 0){
+    animate = true;
+  } else {
+    console.log("No movs added");
+  }
+};
 
 function adjustControls(){
   var rubikControl = document.getElementById('rubik-control');
@@ -83,33 +106,18 @@ function makeCube(scene){
   }
 }
 
-function moveOnAxis(axis, level, direction){
-  var level = level - cubeSize/2 + 0.5 - 1;
-  var core = new THREE.Object3D();
-
-  if(axis != "x" && axis != "y" && axis != "z")
-    return -1;
+function holdFace(core, axis, layer){
+  var level = layer - cubeSize/2 + 0.5 - 1;
 
   scene.add(core);
 
   for (var b=0; b<cubeArray.length; b++)
     if( Math.round(cubeArray[b].getWorldPosition()[axis]) === level )
       THREE.SceneUtils.attach(cubeArray[b], scene, core);
+}
 
-  // For performance (90*(Math.PI/180) = 1.5707963267948966
-  switch(axis){
-    case "x":
-      core.rotation.x += direction*1.5707963267948966;
-      break;
-    case "y":
-      core.rotation.y += direction*1.5707963267948966;
-      break;
-    case "z":
-      core.rotation.z += direction*1.5707963267948966;
-      break;
-  }
-
-  core.updateMatrixWorld();
+function releaseFace(core, axis, layer){
+  var level = layer - cubeSize/2 + 0.5 - 1;
 
   for (var b=0; b<cubeArray.length; b++)
     if( Math.round(cubeArray[b].getWorldPosition()[axis]) === level )
@@ -118,7 +126,7 @@ function moveOnAxis(axis, level, direction){
   scene.remove(core);
 }
 
-function applySteps(steps){
+function parseSteps(steps){
   if(steps === null)
     return -1;
 
@@ -227,15 +235,59 @@ function applySteps(steps){
       }
       pos++;
     }
-    for (var d=0; d<step_times; d++)
-      moveOnAxis(step_axis, step_layer, step_direction);
+    console.log("AddMov", {layer: step_layer -1, axis: step_axis, degrees: step_times * step_direction * 90});
+    //movList.push({layer: step_layer -1, axis: step_axis, degrees: step_times * step_direction * 90});
+    movLayer   = step_layer;
+    movAxis    = step_axis;
+    movTimes   = step_times;
+    movDegrees = step_times * step_direction * 90 * (Math.PI/180);
+
+    attachFace = true;
+  }
+}
+
+function applySteps(){
+  if(attachFace){
+    core = new THREE.Object3D();
+    holdFace(core, movAxis, movLayer);
+    tween = new TWEEN.Tween(core.rotation);
+    switch(movAxis){
+      case "x":
+        tween.to({x: movDegrees}, 400 * movTimes);
+        break;
+      case "y":
+        tween.to({y: movDegrees}, 400 * movTimes);
+        break;
+      case "z":
+        tween.to({z: movDegrees}, 400 * movTimes);
+        break;
+    }
+    tween.onComplete(
+      function(){
+        inMov=false;
+        detachFace=true;
+      }
+    );
+    inMov = true;
+    attachFace = false;
+    tween.start();
+    console.log("attachFace");
+  }
+  if(inMov){
+    TWEEN.update();
+    core.updateMatrixWorld();
+  }
+  if(detachFace){
+    releaseFace(core, movAxis, movLayer);
+    detachFace=false;
+    console.log("detachFace");
   }
 }
 
 function runGL(renderer, camera, controls) {
   requestAnimationFrame( function(){runGL(renderer, camera, controls);} );
   renderer.render( scene, camera );
-  //TWEEN.update();
+  applySteps();
   controls.update();
 }
 
