@@ -9,7 +9,7 @@
       margin:0;
       overflow:hidden;
       text-align:center;
-      background:#424242;
+      background:#D8D8D8;
     }
     #rubik-cube{
       position:absolute;
@@ -22,7 +22,6 @@
       width:100%;
       height:10%;
       bottom:15%;
-      color:white;
       overflow:hidden;
     }
     #rubik-steps-display p{
@@ -60,11 +59,17 @@
 var STEP_TIME = 500;
 var cubeSize  = 2;
 var aCube     = [];
+var toShow    = [];
 var scene     = new THREE.Scene();
 var stepsList   = [];
 var currentStep = 0;
 
 var isInstantMove = false;
+
+var stopPressed = false;
+var playPressed = false;
+var nextPressed = false;
+var prevPressed = false;
 
 var attachFace = false;
 var detachFace = false;
@@ -79,7 +84,7 @@ function setup() {
   var controls  = new THREE.OrbitControls( camera, renderer.domElement );
 
   controls.noPan = true;
-  renderer.setClearColor( 0x424242, 1 );
+  renderer.setClearColor( 0xD8D8D8, 1 );
   renderer.setSize( container.offsetWidth, container.offsetHeight );
   container.appendChild( renderer.domElement );
 
@@ -89,8 +94,13 @@ function setup() {
   cubeSize = size ? size : 3;
   rubikSteps.innerHTML = stepString;
 
+  var toShowString = window.frameElement.getAttribute( "data-show" );
+  if( toShowString !== null) {
+    toShow = toShowString.split( "," );
+  }
+
   renderCube();
-  // console.log(renderer.domElement.toDataURL());
+  parseStepString( window.frameElement.getAttribute( "data-steps" ) );
   resizeControls();
 
   function onResize() {
@@ -118,11 +128,24 @@ function renderCube() {
     new THREE.MeshBasicMaterial( { color:0xFFFFFF } ), // Front  -> White
     new THREE.MeshBasicMaterial( { color:0xFFFF00 } )  // Back   -> Yellow
     ] );
+  var blackMaterial = new THREE.MeshFaceMaterial( [
+    new THREE.MeshBasicMaterial( { color:0x848484 } ), // Right  -> Orange
+    new THREE.MeshBasicMaterial( { color:0x848484 } ), // Left   -> Red
+    new THREE.MeshBasicMaterial( { color:0x848484 } ), // Top    -> Green
+    new THREE.MeshBasicMaterial( { color:0x848484 } ), // Bottom -> Blue
+    new THREE.MeshBasicMaterial( { color:0x848484 } ), // Front  -> White
+    new THREE.MeshBasicMaterial( { color:0x848484 } )  // Back   -> Yellow
+    ] );
 
   for ( var z = -cubeSize / 2 + 0.5; z < cubeSize / 2; z++ ) {
     for ( var x = -cubeSize / 2 + 0.5; x < cubeSize / 2; x++ ) {
       for ( var y = -cubeSize / 2 + 0.5; y < cubeSize / 2; y++ ) {
-        var piece = new THREE.Mesh( geometry, material );
+        var piece = null;
+        if( toShow.length !== 0 && toShow.indexOf( aCube.length.toString() ) < 0 ){
+          piece = new THREE.Mesh( geometry, blackMaterial );
+        } else {
+          piece = new THREE.Mesh( geometry, material );
+        }
         piece.position.set( x, y, z );
         aCube.push( piece );
         scene.add( piece );
@@ -131,8 +154,10 @@ function renderCube() {
   }
 
   var initString = window.frameElement.getAttribute( "data-start" );
-  isInstantMove = true;
-  parseStepString( initString );
+  if( initString !== null){
+    isInstantMove = true;
+    parseStepString( initString );
+  }
 }
 
 function resetCube() {
@@ -140,6 +165,7 @@ function resetCube() {
     scene.remove( aCube[i] );
   aCube = [];
   renderCube( scene );
+  parseStepString( window.frameElement.getAttribute( "data-steps" ) );
 }
 
 function attachFaceToCore( cubeCore, axis, layer ) {
@@ -278,13 +304,11 @@ function parseStepString( steps ) {
       pos++;
     }
   }
-  if(!isInstantMove)
-    attachFace = true;
-  else
-    isInstantMove = false;
 
-  //for(var i = 0, len = stepsList.length; i < len; i++)
-    //console.log(stepsList[i]);
+  if(isInstantMove)
+    isInstantMove = false;
+  //else
+  //  attachFace = true;
 }
 
 function applyInstantSteps(axis, layer, radians) {
@@ -308,7 +332,7 @@ function applyInstantSteps(axis, layer, radians) {
 
 function applySteps() {
   TWEEN.update();
-  if ( attachFace ) {
+  if ( attachFace && playPressed ) {
     cubeCore = new THREE.Object3D();
     attachFaceToCore( cubeCore, stepsList[currentStep].axis, stepsList[currentStep].layer );
     tween = new TWEEN.Tween( cubeCore.rotation );
@@ -338,6 +362,28 @@ function applySteps() {
     currentStep++;
     if ( currentStep < stepsList.length )
       attachFace = true;
+    else {
+      playPressed = false;
+      resetCube();
+      currentStep = 0;
+      var playButton = document.getElementById( "playpause" );
+      playButton.className = "icon-play";
+    }
+
+    if( nextPressed ) {
+      nextPressed = false;
+      attachFace = false;
+    }
+
+    if( stopPressed ) {
+      stopPressed = false;
+      resetCube();
+      currentStep = 0;
+      attachFace = false;
+      playPressed = false;
+      var playButton2 = document.getElementById( "playpause" );
+      playButton2.className = "icon-play";
+    }
   }
 }
 
@@ -357,22 +403,37 @@ function resizeControls() {
   }
 }
 
+var buttonPrev = document.getElementById( "prev" );
+buttonPrev.onclick = function() {
+  prevPressed = true;
+};
+
 var buttonPlay = document.getElementById( "playpause" );
 buttonPlay.onclick = function() {
-  resetCube();
-  parseStepString( window.frameElement.getAttribute( "data-steps" ) );
+  var playButton = document.getElementById( "playpause" );
+  if( playPressed ) {
+    playButton.className = "icon-play";
+    playPressed = !playPressed;
+  } else {
+    playPressed = true;
+    playButton.className = "icon-pause";
+    attachFace = true;
+  }
 };
 
 var buttonStop = document.getElementById( "stop" );
 buttonStop.onclick = function() {
-  resetCube();
+  stopPressed = true;
 };
 
-    /*
-    if ( typeof module !== "undefined" && module.exports ) {
-      module.exports = WEBGLCUBE;
-    }
-    */
+var buttonNext = document.getElementById( "next" );
+buttonNext.onclick = function() {
+  if( !nextPressed ){
+    nextPressed = true;
+    attachFace = true;
+    playPressed = true;
+  }
+};
     </script>
   </body>
 </html>
