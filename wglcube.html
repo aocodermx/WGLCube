@@ -4,41 +4,7 @@
     <meta charset="UTF-8">
     <title>rubikgl-web</title>
     <link rel="stylesheet" href="style.css">
-    <style type="text/css">
-    body{
-      margin:0;
-      overflow:hidden;
-      text-align:center;
-      background:#D8D8D8;
-    }
-    #rubik-cube{
-      position:absolute;
-      width:100%;
-      bottom:30%;
-      top:0;
-    }
-    #rubik-steps-display{
-      position:absolute;
-      width:100%;
-      height:10%;
-      bottom:15%;
-      overflow:hidden;
-    }
-    #rubik-steps-display p{
-      margin:0;
-    }
-    #rubik-controls{
-      position:absolute;
-      width:100%;
-      height:15%;
-      bottom:0;
-    }
-    #rubik-controls button{
-      height:90%;
-      width:23%;
-      font-size:auto;
-    }
-    </style>
+    <style type="text/css"></style>
   </head>
   <body onload="setup();">
     <div id="rubik-cube"></div>
@@ -87,6 +53,8 @@ function setup() {
   renderer.setClearColor( 0xD8D8D8, 1 );
   renderer.setSize( container.offsetWidth, container.offsetHeight );
   container.appendChild( renderer.domElement );
+
+  console.log(window);
 
   var size = window.frameElement.getAttribute( "data-size" );
   var rubikSteps = document.getElementById( "rubik-steps" );

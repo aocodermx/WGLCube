@@ -1,45 +1,77 @@
 @font-face {
-	font-family: 'icomoon';
-	src:url('fonts/icomoon.eot?dnpt86');
-	src:url('fonts/icomoon.eot?#iefixdnpt86') format('embedded-opentype'),
-		url('fonts/icomoon.woff?dnpt86') format('woff'),
-		url('fonts/icomoon.ttf?dnpt86') format('truetype'),
-		url('fonts/icomoon.svg?dnpt86#icomoon') format('svg');
-	font-weight: normal;
-	font-style: normal;
+  font-family: 'icomoon';
+  src:url('fonts/icomoon.eot?dnpt86');
+  src:url('fonts/icomoon.eot?#iefixdnpt86') format('embedded-opentype'),
+    url('fonts/icomoon.woff?dnpt86') format('woff'),
+    url('fonts/icomoon.ttf?dnpt86') format('truetype'),
+    url('fonts/icomoon.svg?dnpt86#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-	font-family: 'icomoon';
-	speak: none;
-	font-style: normal;
-	font-weight: normal;
-	font-variant: normal;
-	text-transform: none;
-	line-height: 1;
+  font-family: 'icomoon';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
 
-	/* Better Font Rendering =========== */
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .icon-play:before {
-	content: "\ea15";
+  content: "\ea15";
 }
 
 .icon-pause:before {
-	content: "\ea16";
+  content: "\ea16";
 }
 
 .icon-stop:before {
-	content: "\ea17";
+  content: "\ea17";
 }
 
 .icon-previous:before {
-	content: "\ea18";
+  content: "\ea18";
 }
 
 .icon-next:before {
-	content: "\ea19";
+  content: "\ea19";
 }
-
+body{
+  margin:0;
+  overflow:hidden;
+  text-align:center;
+  background:#D8D8D8;
+}
+#rubik-cube{
+  position:absolute;
+  width:100%;
+  bottom:30%;
+  top:0;
+}
+#rubik-steps-display{
+  position:absolute;
+  width:100%;
+  height:10%;
+  bottom:15%;
+  overflow:hidden;
+}
+#rubik-steps-display p{
+  margin:0;
+}
+#rubik-controls{
+  position:absolute;
+  width:100%;
+  height:15%;
+  bottom:0;
+}
+#rubik-controls button{
+  height:90%;
+  width:23%;
+  font-size:auto;
+}

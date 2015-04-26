@@ -1,7 +1,7 @@
 # TODO for rubikgl-web
   * Create a connection with WCA scrambler.
   * Create a 3D model for original rubiks cube, and variations.
-  * [Done]: Create a namespace for the cube and a friendly plugin API.
+  * Create a namespace for the cube and a friendly plugin API.
   * [Done]: Fix linter Warnings
 
 ## Usability
