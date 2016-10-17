@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo usage for wglcube_player</title>
+    <link rel="stylesheet" href="wglcube_player.css"> <!-- Style sheet for wglcube_player, you can customize some colors. -->
+  </head>
+  <body>
+
+    <h1> Usage example for wglcube_player.</h1>
+    <!-- Root element for wglcube_player, where
+      data-size  is the size for the cube to display, 2 to 12 are supported until now.
+      data-init  are the initialization steps.
+      data-steps are the steps to play.
+    -->
+    <div
+      id='wglcube_player'
+      style='width:200px;height:200px'
+      data-size='3'
+      data-init='L U D'
+      data-steps='D U L'
+      data-show='1,6'>
+        <!-- Here the cube will be drawn. -->
+    </div>
+
+    <!-- Dependencies for wglcube_player -->
+    <script src="js/three.min.js"></script>
+    <script src="js/OrbitControls.min.js"></script>
+    <script src="js/SceneUtils.min.js"></script>
+    <script src="js/tween.min.js"></script>
+
+    <script src="wglcube_player.js"></script> <!-- or wglcube_player.min.js for better performance -->
+  </body>
+</html>
