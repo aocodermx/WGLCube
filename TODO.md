@@ -9,8 +9,8 @@
   * Fix big cubes errors in animations.
   * Add buttons and controls for action/movements like cube size, cube type/brand, stickers.
   * Add a indicator for faces.
-  * Make it portable, embeddable and easy to use in custom pages.
-  * Automatize build process.
+  * [Done]: Make it portable, embeddable and easy to use in custom pages.
+  * [Done]: Automatize build process.
   * [Done]: Add animations.
 
 ## Logic
