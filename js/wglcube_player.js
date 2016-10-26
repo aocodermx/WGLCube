@@ -3,17 +3,55 @@ var WGLCUBE_PLAYER = ( function ( params ) {
 
   // Variable to store the HTML for the player controls.
   var markup = "                                            \
-  <div id='rubik-cube'></div>                               \
-  <div id='rubik-steps-display'>                            \
-    <p id='rubik-steps'></p>                                \
+  <div class='wglcube'>                                     \
+    <div class='preview'>                                   \
+      <div class='square s1'></div>                         \
+      <div class='square s2'></div>                         \
+      <div class='square s3'></div>                         \
+      <div class='square s4'></div>                         \
+    </div>                                                  \
   </div>                                                    \
-  <div id='rubik-controls'>                                 \
+  <div class='steps-container'>                             \
+  </div>                                                    \
+  <div class='controls'>                                    \
     <button class='icon-previous' id='prev'></button>       \
     <button class='icon-play'     id='playpause'></button>  \
     <button class='icon-stop'     id='stop'></button>       \
     <button class='icon-next'     id='next'></button>       \
+    <button class='icon-next'     id='screenshot'></button> \
   </div>                                                    \
   ";
+
+  // The main container, the root container
+  var wglcube_player_container;
+
+  // The size for the cube
+  var wglcube_player_size;
+
+  // The steps to initialize the cube
+  var wglcube_player_init;
+
+  // The steps to play
+  var wglcube_player_steps;
+
+  params.drawControls = function ( ) {
+    wglcube_player_container = document.getElementById ( 'wglcube_player' );
+    wglcube_player_container.innerHTML = markup;
+
+    wglcube_player_size  = wglcube_player_container.getAttribute( "data-size"  );
+    wglcube_player_steps = wglcube_player_container.getAttribute( "data-steps" );
+    wglcube_player_init  = wglcube_player_container.getAttribute( "data-init"  );
+
+    var layout_steps = wglcube_player_container.getElementsByClassName( "steps-container" )[0];
+
+    var wglcube_player_steps_split = wglcube_player_steps.split ( " " );
+    for ( var i = 0; i < wglcube_player_steps_split.length; i++ ) {
+      var span_step = document.createElement ( "span" );
+      span_step.innerHTML = wglcube_player_steps_split[i];
+      span_step.className = "step_" + i;
+      layout_steps.appendChild ( span_step );
+    }
+  }
 
   var STEP_TIME = 500;
   var cubeSize  = 2;
@@ -37,9 +75,6 @@ var WGLCUBE_PLAYER = ( function ( params ) {
   var tween = null;
 
   params.render = function (  ) {
-    var wglcube_player_root = document.getElementById ( 'wglcube_player' );
-    wglcube_player_root.innerHTML = markup;
-
     var container = document.getElementById( "rubik-cube" );
     var renderer  = window.WebGLRenderingContext ? new THREE.WebGLRenderer( { antialias:true, preserveDrawingBuffer: true } ) : new THREE.CanvasRenderer();
     var camera    = new THREE.PerspectiveCamera( 45, container.offsetWidth / ( container.offsetHeight ), 0.1, 1000 );
@@ -68,50 +103,56 @@ var WGLCUBE_PLAYER = ( function ( params ) {
     resizeControls();
 
     // Event listeners
-    function onResize() {
+    document.getElementById ( "rubik-cube" ).addEventListener( "resize", function ( ) {
+      console.log ( "resized " );
       var container = document.getElementById( "rubik-cube" );
       var WIDTH  = container.offsetWidth, HEIGHT = container.offsetHeight;
       renderer.setSize( WIDTH, HEIGHT );
       camera.aspect = WIDTH / HEIGHT;
       camera.updateProjectionMatrix();
       resizeControls();
-    }
+    } );
 
-    window.addEventListener( "resize", onResize);
-    var buttonPrev = document.getElementById( "prev" );
-    buttonPrev.onclick = function() {
-      prevPressed = true;
-    };
-
-    var buttonPlay = document.getElementById( "playpause" );
-    buttonPlay.onclick = function() {
-      var playButton = document.getElementById( "playpause" );
-      if( playPressed ) {
-        playButton.className = "icon-play";
-        playPressed = !playPressed;
-      } else {
-        playPressed = true;
-        playButton.className = "icon-pause";
-        attachFace = true;
-      }
-    };
-
-    var buttonStop = document.getElementById( "stop" );
-    buttonStop.onclick = function() {
-      stopPressed = true;
-    };
-
-    var buttonNext = document.getElementById( "next" );
-    buttonNext.onclick = function() {
-      if( !nextPressed ){
-        nextPressed = true;
-        attachFace = true;
-        playPressed = true;
-      }
-    };
+    document.getElementById( "prev"      ).addEventListener ( "click", onPrevClick );
+    document.getElementById( "playpause" ).addEventListener ( "click", onPlayClick );
+    document.getElementById( "stop"      ).addEventListener ( "click", onStopClick );
+    document.getElementById( "next"      ).addEventListener ( "click", onNextClick );
 
     camera.position.addScalar( cubeSize * 1.4 );
     runGL( renderer, camera, controls );
+  }
+
+  function onPrevClick ( ) {
+    console.log ( "onPrevClick pressed" );
+    prevPressed = true;
+  }
+
+  function onPlayClick (  ) {
+    console.log ( "onPlayClick pressed" );
+    var playButton = document.getElementById( "playpause" );
+    if( playPressed ) {
+      playButton.className = "icon-play";
+      playPressed = !playPressed;
+    } else {
+      playPressed = true;
+      playButton.className = "icon-pause";
+      attachFace = true;
+    }
+  }
+
+  function onStopClick ( ) {
+    console.log ( "onStopClick pressed" );
+    detachFace = true;
+    stopPressed = true;
+  }
+
+  function onNextClick ( ) {
+    console.log ( "onNextClick pressed" );
+    if( !nextPressed ){
+      nextPressed = true;
+      attachFace = true;
+      playPressed = true;
+    }
   }
 
   function renderCube() {
@@ -157,6 +198,7 @@ var WGLCUBE_PLAYER = ( function ( params ) {
   }
 
   function resetCube() {
+    console.log ( "Reseting cube" );
     for ( var i = 0, len = aCube.length; i < len; i++ )
       scene.remove( aCube[i] );
     aCube = [];
@@ -402,4 +444,4 @@ var WGLCUBE_PLAYER = ( function ( params ) {
   return params;
 }( WGLCUBE_PLAYER || {} ) );
 
-WGLCUBE_PLAYER.render ( );
+WGLCUBE_PLAYER.drawControls ( );

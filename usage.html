@@ -10,16 +10,15 @@
     <h1> Usage example for wglcube_player.</h1>
     <!-- Root element for wglcube_player, where
       data-size  is the size for the cube to display, 2 to 12 are supported until now.
-      data-init  are the initialization steps.
-      data-steps are the steps to play.
+      data-init  are the initialization steps separated by spaces.
+      data-steps are the steps separated by spaces to play in the cube.
     -->
     <div
       id='wglcube_player'
       style='width:300px;height:300px'
       data-size='3'
       data-init='L U D'
-      data-steps='D U L D R2 L2 U D L U D R T B'
-      data-show='1,6'>
+      data-steps='D U L D R2 L2 U D L U'>
         <!-- Here the cube will be drawn. -->
     </div>
 
@@ -29,6 +28,6 @@
     <script src="js/SceneUtils.min.js"></script>
     <script src="js/tween.min.js"></script>
 
-    <script src="js/wglcube_player_1.0.1.min.js"></script> <!-- or wglcube_player.min.js for better performance -->
+    <script src="js/wglcube_player.js"></script> <!-- or wglcube_player.min.js for better performance -->
   </body>
 </html>
