@@ -1,4 +1,5 @@
 # TODO for rubikgl-web
+  * Update Threejs version used.
   * Create a connection with WCA scrambler.
   * Create a 3D model for original Rubiks cube, and variations.
   * Create a namespace for the cube and a friendly plugin API.
