@@ -1,0 +1,24 @@
+{
+  "name": "wglcube",
+  "version": "1.0.0",
+  "description": "Magic cube with WebGL",
+  "main": "wglcube_player.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "WebGL",
+    "Magic",
+    "Cube"
+  ],
+  "author": "aocodermx",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^2.0.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.0.0",
+    "jshint": "^2.9.4"
+  }
+}

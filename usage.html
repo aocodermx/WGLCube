@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Demo usage for wglcube_player</title>
-    <link rel="stylesheet" href="css/wglcube_player_1.0.1.min.css"> <!-- Style sheet for wglcube_player, you can customize some colors. -->
+    <link rel="stylesheet" href="css/wglcube.css"> <!-- Style sheet for wglcube_player, you can customize some colors. -->
   </head>
   <body>
 
@@ -12,22 +12,24 @@
       data-size  is the size for the cube to display, 2 to 12 are supported until now.
       data-init  are the initialization steps separated by spaces.
       data-steps are the steps separated by spaces to play in the cube.
+      data-show  are the index for the cubes to hightlight.
     -->
     <div
       class='wglcube'
       data-size='3'
       data-init='L U D'
       data-steps='D U L D R2 L2 U D L U'
-      style='width:300px;height:300px'>
+      style='width:300px;height:400px'>
         <!-- Here the cube will be drawn. -->
     </div>
 
     <!-- Dependencies for wglcube_player -->
-    <script src="js/three.min.js"></script>
-    <script src="js/OrbitControls.min.js"></script>
-    <script src="js/SceneUtils.min.js"></script>
-    <script src="js/tween.min.js"></script>
+    <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/OrbitControls.min.js"></script>
+    <script src="js/lib/SceneUtils.min.js"></script>
+    <script src="js/lib/tween.min.js"></script>
 
-    <script src="js/wglcube_player.js"></script> <!-- or wglcube_player.min.js for better performance -->
+    <script src="js/wglcube_1.0.0.min.js"></script> <!-- or wglcube_player.min.js for better performance -->
+    <script src="js/app.js"></script>
   </body>
 </html>
