@@ -13,26 +13,29 @@ var WGL = ( function ( params ) {
     *       In this mode the 3D code is executed to render the cube, so the user
     *       can now interact with the cube.
     */
-    params.Cube = function ( dom_container ) {
-        var self       = this;   // To avoid this confusion in callback functions.
+    params.Core = function ( dom_container ) {
+        var self = this;   // To avoid this confusion in callback functions.
 
         // Public properties.
         self.size      = null; // Size for the cube
-        self.STEP_TIME = 500;    // Time for each single move
-
+        self.STEP_TIME = 500;  // Time for each single move
 
         var RootContainer = null;   // Root DOM Container
         var CubeArray     = [];     // Array to hold 3d cubes
         var CubesToShow   = [];     // Array to store the index for the pieces to highlight
         var CubeCore      = null;   // Core object, needed to perform movements
-        var CubeContainer = null    // Container for the 3d cube
+        var CubeContainer = null;   // Container for the 3d cube
 
-        var animationFrameId = null;    // Animation frame id to stop animation.
-        var animationRunning = false;   // Flag when animation is running.
-        var animationAxis    = null;    // axis to move when an animation is performed.
-        var animationLayer   = null;    // layer to move when an animation is performed.
-        var animationRadians = null;    // radians to move when an animation is performed.
-        var animationCount   = null;    // time factor when an animation is performed.
+        var tween            = null;  // For animating the cube
+        var animationFrameId = null;  // Animation frame id to stop animation.
+        var animationStart   = false; // start animation.
+        var animationAxis    = null;  // axis to move when an animation is performed.
+        var animationLayer   = null;  // layer to move when an animation is performed.
+        var animationRadians = null;  // radians to move when an animation is performed.
+        var animationCount   = null;  // time factor when an animation is performed.
+        var animationRunning = null;  // Flag when animation is running, to avoid cube malformation.
+
+        var animationFinishCallback = null; // Executed when the animation finishes.
 
         var scene    = null;   // WebGL Scene
         var renderer = null;   // WebGL Renderer
@@ -45,39 +48,46 @@ var WGL = ( function ( params ) {
          *  Cube, other initialization code goes here.
          */
         function init ( dom_container ) {
-            RootContainer            = dom_container;
-            self.size                = RootContainer.getAttribute ( 'data-size'  );
-            RootContainer.innerHTML = "            \
-                <div class='preview'>               \
-                    <div class='square s1'></div>   \
-                    <div class='square s2'></div>   \
-                    <div class='square s3'></div>   \
-                    <div class='square s4'></div>   \
-                </div>                              \
-                <div class='cube'>                  \
-                </div>                              \
-            ";
+            RootContainer = dom_container;
+            self.size     = RootContainer.getAttribute ( 'data-size'  );
 
             var CubesToShowString = RootContainer.getAttribute ( "data-show" );
             if ( CubesToShowString !== null) {
                 CubesToShow = CubesToShowString.split( "," );
             }
 
-            RootContainer.addEventListener ( 'click', self.to_interactive_mode );
-        };
+            var div_preview       = document.createElement ( 'div' );
+            div_preview.className = 'preview';
+            div_preview.innerHTML =
+                "<div class='square s1'></div>" +
+                "<div class='square s2'></div>" +
+                "<div class='square s3'></div>" +
+                "<div class='square s4'></div>";
+
+            var div_cube       = document.createElement ( 'div' );
+            div_cube.className = 'cube';
+
+            RootContainer.appendChild ( div_preview );
+            RootContainer.appendChild ( div_cube );
+        }
 
 
         /*
          *  Function to change from preview mode to interactive mode.
          */
         this.to_interactive_mode = function ( ) {
-            var preview   = RootContainer.getElementsByClassName ( 'preview' )[0];
-            preview.style = 'display:none;';
+            var div_preview   = RootContainer.getElementsByClassName ( 'preview' )[0];
+            div_preview.classList.remove ( 'util-show' );
+            div_preview.classList.add    ( 'util-hide' );
+            // div_preview.style = 'display:none; ';
+
+            var div_cube = RootContainer.getElementsByClassName ( 'cube' )[0];
+            div_cube.classList.remove ( 'util-hide' );
+            div_cube.classList.add    ( 'util-show' );
+            // div_cube.style = 'display:block;';
 
             // Load WGL
             init3d ( );
-
-            RootContainer.removeEventListener ( 'click', self.to_interactive_mode );
         };
 
 
@@ -85,8 +95,15 @@ var WGL = ( function ( params ) {
         *  Function to change from interactive mode to preview mode.
         */
         this.to_preview_mode = function ( ) {
-            var preview   = container.getElementsByClassName ( 'preview' )[0];
-            preview.style = 'display:block;';
+            var div_preview   = RootContainer.getElementsByClassName ( 'preview' )[0];
+            div_preview.classList.remove ( 'util-hide' );
+            div_preview.classList.add    ( 'util-show' );
+            // div_preview.style = 'display:block;';
+
+            var div_cube = RootContainer.getElementsByClassName ( 'cube' )[0];
+            div_cube.classList.remove ( 'util-show' );
+            div_cube.classList.add    ( 'util-hide' );
+            // div_cube.style = 'display:none;';
 
             cancelAnimationFrame ( animationFrameId );
             // TODO: Update threejs version used.
@@ -95,38 +112,52 @@ var WGL = ( function ( params ) {
             renderer = null;
             camera   = null;
             controls = null;
-            while ( CubeContainer.lastChild ) CubeContainer.removeChild( CubeContainer.lastChild );
 
-            container.addEventListener ( 'click', self.to_interactive_mode );
+            while ( CubeContainer.lastChild ) CubeContainer.removeChild( CubeContainer.lastChild );
         };
 
 
         /*
-        *    Function to reset the cube to the original state
+        *    Function to reset the cube to the original position.
         */
-        this.resetCube = function ( ) {
+        this.Reset = function (  ) {
+            // TODO: STOP TWEEN ANIMATION
+            if ( tween != null && animationRunning )
+                tween.end ( );
+
             for ( var i = 0, len = CubeArray.length; i < len; i++ )
                 scene.remove ( CubeArray[i] );
+
             CubeArray = [];
             renderCube( scene );
         };
 
 
         /*
-        *   Function to parse a move string
+        *   Function to parse a move string based in the form:
         *
         *       [Layer]Face[Times][Direction]
         *
         *   Where:
         *
-        *       Layer    : is the number for the layer to move from 1 to N.
-        *       Face     : is the face to move U|L|F|R|B|D.
-        *       Times    : the number of times to move the selected face from 1 to N.
-        *       Direction: invert the move or not.
+        *       stepString    : the steps string to apply.
+        *       animated      : true if animation will be executed, false otherwise.
+        *       callback_start: a function to be executed when animation start.
+        *       callback_end  : a function to be executed when animation finishes,
+        *                       if animated is false, this will be ignored.
         *
         *       TODO: Implement Face X Y Z to rotate the entire cube.
         */
-        this.singleMove = function ( stepString, animated ) {
+        this.Move = function ( stepString, animated, callback_start, callback_end ) {
+
+            if ( animationRunning ) {
+                console.log ( "Animation not finished, try again later.");
+                return;
+            }
+
+            if ( animated ) {
+                callback_start ( );
+            }
 
             stepString  += " ";
 
@@ -226,7 +257,8 @@ var WGL = ( function ( params ) {
                                 animationLayer   = step_layer;
                                 animationRadians = step_times * step_direction * 90 * ( Math.PI / 180 );
                                 animationCount   = step_times;
-                                animationRunning = true;
+                                animationStart   = true;
+                                animationFinishCallback = callback_end;
                             } else {
                                 moveFaceInstantly ( step_axis, step_layer, step_times * step_direction * 90 * ( Math.PI / 180 ) );
                             }
@@ -268,7 +300,7 @@ var WGL = ( function ( params ) {
 
             camera.position.addScalar ( self.size * 1.4 );
             wglLoop ( renderer, camera, controls );
-        };
+        }
 
 
         /*
@@ -309,7 +341,7 @@ var WGL = ( function ( params ) {
                     }
                 }
             }
-        };
+        }
 
 
         /*
@@ -348,11 +380,9 @@ var WGL = ( function ( params ) {
         *  Runs an animation if it exists.
         */
         function runAnimation ( ) {
-            var tween = null;
-
             TWEEN.update ( );
 
-            if ( animationRunning ) {
+            if ( animationStart ) {
                 CubeCore = new THREE.Object3D ( );
                 attachFaceToCore ( CubeCore, animationAxis, animationLayer );
                 tween = new TWEEN.Tween ( CubeCore.rotation );
@@ -371,9 +401,14 @@ var WGL = ( function ( params ) {
                     function ( ) {
                         CubeCore.updateMatrixWorld ( );
                         detachFaceFromCore ( CubeCore, animationAxis, animationLayer );
+                        animationRunning = false;
+                        animationFinishCallback ( );
+
+                        console.log ( "Tween on complete finished." );
                     }
                 );
-                animationRunning = false;
+                animationStart   = false;
+                animationRunning = true;
                 tween.start();
             }
         }
