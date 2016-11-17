@@ -108,7 +108,7 @@ var WGL = ( function ( params ) {
             cancelAnimationFrame ( animationFrameId );
             // TODO: Update threejs version used.
             // renderer.context.canvas.loseContext ( );
-            // renderer.forceContextLoss ( );
+            renderer.forceContextLoss ( );
             renderer = null;
             camera   = null;
             controls = null;
@@ -121,15 +121,10 @@ var WGL = ( function ( params ) {
         *    Function to reset the cube to the original position.
         */
         this.Reset = function (  ) {
-            // TODO: STOP TWEEN ANIMATION
             if ( tween != null && animationRunning )
-                tween.end ( );
-
-            for ( var i = 0, len = CubeArray.length; i < len; i++ )
-                scene.remove ( CubeArray[i] );
-
-            CubeArray = [];
-            renderCube( scene );
+                tween.stop ( );
+            else
+                renderCube ( scene );
         };
 
 
@@ -288,7 +283,7 @@ var WGL = ( function ( params ) {
             camera    = new THREE.PerspectiveCamera ( 45, CubeContainer.offsetWidth / ( CubeContainer.offsetHeight ), 0.1, 1000 );
             controls  = new THREE.OrbitControls ( camera, renderer.domElement );
 
-            controls.noPan = true;
+            controls.enablePan = false;
             renderer.setClearColor    ( 0xD8D8D8, 1 );
             renderer.setSize          ( CubeContainer.offsetWidth, CubeContainer.offsetHeight );
             CubeContainer.appendChild ( renderer.domElement );
@@ -307,6 +302,11 @@ var WGL = ( function ( params ) {
         *  Function to draw the cube in the WebGL environment.
         */
         function renderCube ( ) {
+            for ( var i = 0, len = CubeArray.length; i < len; i++ )
+                scene.remove ( CubeArray[i] );
+
+            CubeArray = [];
+
             var
                 geometry = new THREE.BoxGeometry ( 0.98, 0.98, 0.98 ),
                 material = new THREE.MeshFaceMaterial ( [
@@ -397,6 +397,16 @@ var WGL = ( function ( params ) {
                         tween.to ( { z: animationRadians }, self.STEP_TIME * animationCount );
                         break;
                 }
+                tween.onStop (
+                    function ( ) {
+                        CubeCore.updateMatrixWorld ( );
+                        detachFaceFromCore ( CubeCore, animationAxis, animationLayer );
+                        animationRunning = false;
+                        renderCube( scene );
+
+                        console.log ( "Tween onStop called" );
+                    }
+                );
                 tween.onComplete (
                     function ( ) {
                         CubeCore.updateMatrixWorld ( );
@@ -404,7 +414,7 @@ var WGL = ( function ( params ) {
                         animationRunning = false;
                         animationFinishCallback ( );
 
-                        console.log ( "Tween on complete finished." );
+                        console.log ( "Tween onComplete called" );
                     }
                 );
                 animationStart   = false;

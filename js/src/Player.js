@@ -30,7 +30,6 @@ var WGL = ( function ( params ) {
             var button_stop   = document.createElement ( 'button' );
             var button_play   = document.createElement ( 'button' );
             var button_next   = document.createElement ( 'button' );
-            var button_config = document.createElement ( 'button');
             var button_close  = document.createElement ( 'button');
 
             div_step_list.className = "steps-container";
@@ -41,7 +40,6 @@ var WGL = ( function ( params ) {
             button_stop.className   = 'icon-stop';
             button_play.className   = 'icon-play play-pause';
             button_next.className   = 'icon-next';
-            button_config.className = 'icon-shot';
             button_close.className  = 'icon-close';
 
             for ( var i = 0; i < player_steps.length; i++ ) {
@@ -60,16 +58,23 @@ var WGL = ( function ( params ) {
             button_close.addEventListener  ( 'click', self.to_preview_mode );
             RootContainer.addEventListener ( 'click', self.to_interactive_mode );
 
-            div_controls.appendChild  ( button_prev );
-            div_controls.appendChild  ( button_stop );
-            div_controls.appendChild  ( button_play );
-            div_controls.appendChild  ( button_next );
-            div_controls.appendChild  ( button_config );
-            div_controls.appendChild  ( button_close  );
+            div_controls.appendChild  ( button_prev  );
+            div_controls.appendChild  ( button_stop  );
+            div_controls.appendChild  ( button_play  );
+            div_controls.appendChild  ( button_next  );
+            div_controls.appendChild  ( button_close );
 
             RootContainer.appendChild ( div_step_list );
             RootContainer.appendChild ( div_hint );
             RootContainer.appendChild ( div_controls );
+
+            var font_size = 1;
+            while ( div_step_list.scrollHeight != div_step_list.offsetHeight ) {
+                font_size -= 0.01;
+                div_step_list.style.fontSize = font_size + "em";
+                if ( font_size < 0.2 )
+                    break;
+            }
         }
 
         this.to_interactive_mode = function ( e ) {
@@ -142,16 +147,17 @@ var WGL = ( function ( params ) {
         }
 
         function on_button_stop ( ) {
+
+            var span_step = RootContainer.getElementsByClassName ( 'step_' + player_step )[0];
+            if ( typeof span_step !== 'undefined' )
+                span_step.classList.remove ( 'current-step' );
+
             player_step    = 0;
             player_forward = true;
             player_playing = false;
 
             cube.Reset ( );
             cube.Move ( player_init, false );
-
-            var span_step = RootContainer.getElementsByClassName ( 'step_' + player_step )[0];
-            if ( typeof span_step !== 'undefined' )
-                span_step.classList.remove ( 'current-step' );
 
             var button_play = RootContainer.getElementsByClassName ( 'play-pause' )[0];
             button_play.classList.remove ( 'icon-pause' );
