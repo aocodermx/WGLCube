@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo usage for wglcube_player</title>
+    <link rel="stylesheet" href="css/wglcube_V1.0.0.min.css"> <!-- Style sheet for wglcube_player, you can customize some colors. -->
+
+    <style type="text/css">
+        table, th, td {
+            border: 1px solid black;
+        }
+        table {
+            margin-left: 2em;
+        }
+    </style>
+
+  </head>
+  <body>
+
+    <h1> Usage for WGLCube.Player</h1>
+    <p>To display a WGLCube.Player plugin, you only need a div element with a className wglcube and specify the following parameters.</p>
+    <ul>
+      <li><strong>data-size</strong> is the size for the cube to display, 2 to 12 are supported until now.</li>
+      <li><strong>data-init</strong> are the initialization steps separated by spaces.</li>
+      <li><strong>data-steps</strong> are the steps separated by spaces to play in the cube.</li>
+      <li><strong>data-show</strong> are the index for the cubes to hightlight.</li>
+    </ul>
+
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Cube Size
+                </th>
+                <th>
+                    HTML Code
+                </th>
+                <th>
+                    Output
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    2x2x2
+                </td>
+                <td>
+                    <pre>
+&lt;div class='wglcube_player'
+    data-size='2'
+    data-init='L U D'
+    data-steps='D U L D R2'
+    style='width:200px;height:300px'&gt;
+&lt;/div&gt;
+                    </pre>
+                </td>
+                <td>
+                    <div class='wglcube_player'
+                        data-size='2'
+                        data-init='L U D'
+                        data-steps='D U L D R2'
+                        style='width:200px;height:300px'></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    3x3x3
+                </td>
+                <td>
+                    <pre>
+&lt;div class='wglcube_player'
+    data-size='3'
+    data-init='L U D'
+    data-steps='D U L D R2'
+    style='width:200px;height:300px'&gt;
+&lt;/div&gt;
+                    </pre>
+                </td>
+                <td>
+                    <div class='wglcube_player'
+                        data-size='3'
+                        data-init='L U D'
+                        data-steps='D U L D R2'
+                        style='width:200px;height:300px'></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    4x4x4
+                </td>
+                <td>
+                    <pre>
+&lt;div class='wglcube_player'
+    data-size='3'
+    data-init='L U D'
+    data-steps='D U L D R2'
+    style='width:200px;height:300px'&gt;
+&lt;/div&gt;
+                    </pre>
+                </td>
+                <td>
+                    <div class='wglcube_player'
+                        data-size='4'
+                        data-init='L U D'
+                        data-steps='D U L D R2'
+                        style='width:200px;height:300px'></div>
+                </td>
+            </tr>
+        </thead>
+    </table>
+
+
+    <!-- Dependencies for WGLCube -->
+    <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/OrbitControls.min.js"></script>
+    <script src="js/lib/Tween.min.js"></script>
+
+    <script src="js/wglcube_V1.0.0.min.js"></script> <!-- or wglcube_player.min.js for better performance -->
+  </body>
+</html>

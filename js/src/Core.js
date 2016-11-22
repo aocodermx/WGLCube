@@ -18,7 +18,7 @@ var WGL = ( function ( params ) {
 
         // Public properties.
         self.size      = null; // Size for the cube
-        self.STEP_TIME = 500;  // Time for each single move
+        self.STEP_TIME = 750;  // Time for each single move
 
         var RootContainer = null;   // Root DOM Container
         var CubeArray     = [];     // Array to hold 3d cubes
@@ -50,6 +50,10 @@ var WGL = ( function ( params ) {
         function init ( dom_container ) {
             RootContainer = dom_container;
             self.size     = RootContainer.getAttribute ( 'data-size'  );
+            if ( typeof self.size === 'undefined' ) {
+                console.log ( 'data-size parameter needed in order to render cube.' );
+                return 0;
+            }
 
             var CubesToShowString = RootContainer.getAttribute ( "data-show" );
             if ( CubesToShowString !== null) {
@@ -108,12 +112,15 @@ var WGL = ( function ( params ) {
             cancelAnimationFrame ( animationFrameId );
             // TODO: Update threejs version used.
             // renderer.context.canvas.loseContext ( );
-            renderer.forceContextLoss ( );
-            renderer = null;
-            camera   = null;
-            controls = null;
+            if ( renderer != null ) {
+                renderer.forceContextLoss ( );
+                renderer = null;
+                camera   = null;
+                controls = null;
 
-            while ( CubeContainer.lastChild ) CubeContainer.removeChild( CubeContainer.lastChild );
+                while ( CubeContainer.lastChild ) CubeContainer.removeChild( CubeContainer.lastChild );
+            }
+
         };
 
 
@@ -353,7 +360,7 @@ var WGL = ( function ( params ) {
             scene.add ( CubeCore );
 
             for ( var b = 0, len = CubeArray.length; b < len; b++ ) {
-                if ( ( CubeArray[b].getWorldPosition ( )[axis] | 0 ) === level ) {
+                if ( ( CubeArray[b].getWorldPosition ( )[axis] ) === level ) {
                     THREE.SceneUtils.attach ( CubeArray[b], scene, CubeCore );
                 }
             }
@@ -367,7 +374,7 @@ var WGL = ( function ( params ) {
             var level = layer - self.size / 2 + 0.5 - 1;
 
             for ( var b = 0, len = CubeArray.length; b < len; b++ ) {
-                if ( ( CubeArray[b].getWorldPosition ( )[axis] | 0 ) === level ) {
+                if ( ( CubeArray[b].getWorldPosition ( )[axis] ) === level ) {
                     THREE.SceneUtils.detach ( CubeArray[b], CubeCore, scene );
                 }
             }
@@ -404,7 +411,7 @@ var WGL = ( function ( params ) {
                         animationRunning = false;
                         renderCube( scene );
 
-                        console.log ( "Tween onStop called" );
+                        // console.log ( "Tween onStop called" );
                     }
                 );
                 tween.onComplete (
@@ -414,7 +421,7 @@ var WGL = ( function ( params ) {
                         animationRunning = false;
                         animationFinishCallback ( );
 
-                        console.log ( "Tween onComplete called" );
+                        // console.log ( "Tween onComplete called" );
                     }
                 );
                 animationStart   = false;

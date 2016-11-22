@@ -1,11 +1,28 @@
 var WGL = ( function ( params ) {
 
+    /*
+    *  Object to represent an algorithm player to play, pause move forward or
+    *  backward step by step and stop the algorithm execution, the player can
+    *  be in one of the folowing two modes:
+    *
+    *  * Preview mode:
+    *       In this mode a simple preview is presented until the user interact
+    *       with the control, at this point the player change it's mode to
+    *       interactive.
+    *
+    *  * Interactive mode:
+    *       In this mode the 3D code is executed to render the cube and to display
+    *       the controls to manipulate the player, so the user can interact with
+    *       the player.
+    *
+    */
     params.Player = function ( dom_container ) {
         var self = this;   // To avoid this confusion in callback functions.
 
-        var cube           = null;
+        var core           = null;
         var RootContainer  = null;
 
+        var player_preview = true;
         var player_step    = 0;
         var player_init    = null;
         var player_steps   = null;
@@ -16,11 +33,14 @@ var WGL = ( function ( params ) {
         function init ( dom_container ) {
             RootContainer = dom_container;
 
-            cube         = new WGL.Core ( RootContainer );
+            core         = new WGL.Core ( RootContainer );
             player_init  =   RootContainer.getAttribute ( 'data-init' );
             player_steps = ( RootContainer.getAttribute ( 'data-steps' ) ).split( ' ' );
+            if ( player_steps === null ) {
+                console.log ( 'data-steps needed in order to display an algorithm execution.' );
+            }
 
-            // cube.STEP_TIME = 2500; // For test pruporses.
+            // core.STEP_TIME = 2500; // For test pruporses.
 
             var div_step_list = document.createElement ( 'div'    );
             var div_controls  = document.createElement ( 'div'    );
@@ -78,6 +98,8 @@ var WGL = ( function ( params ) {
         }
 
         this.to_interactive_mode = function ( e ) {
+            player_preview = false;
+
             var div_controls = RootContainer.getElementsByClassName ( 'controls' )[0];
             div_controls.classList.remove ( 'util-hide' );
             div_controls.classList.add    ( 'util-show' );
@@ -92,13 +114,15 @@ var WGL = ( function ( params ) {
             RootContainer.classList.remove ( 'util-cursor-hand' );
             RootContainer.classList.add    ( 'util-cursor-none' );
 
-            cube.to_interactive_mode ( );
-            cube.Move ( player_init, false, null );
+            core.to_interactive_mode ( );
+            core.Move ( player_init, false, null );
             on_button_stop ( );
             RootContainer.removeEventListener ( 'click', self.to_interactive_mode );
         };
 
         this.to_preview_mode = function ( e ) {
+            player_preview = true;
+
             var div_controls = RootContainer.getElementsByClassName ( 'controls' )[0];
             div_controls.classList.remove ( 'util-show' );
             div_controls.classList.add    ( 'util-hide' );
@@ -113,10 +137,27 @@ var WGL = ( function ( params ) {
             RootContainer.classList.remove ( 'util-cursor-none' );
             RootContainer.classList.add    ( 'util-cursor-hand' );
 
-            cube.to_preview_mode ( );
+            core.to_preview_mode ( );
             RootContainer.addEventListener ( 'click', self.to_interactive_mode );
 
-            e.cancelBubble = true;
+            if ( typeof e !== 'undefined')
+                e.cancelBubble = true;
+        };
+
+        this.isPreview = function ( ) {
+            return player_preview;
+        };
+
+        this.isScrolledIntoView = function ( ) {
+            var elemTop    = RootContainer.getBoundingClientRect().top;
+            var elemBottom = RootContainer.getBoundingClientRect().bottom;
+
+            var isVisible = (elemBottom >= 0) && (elemTop <= window.innerHeight);
+
+            if ( !isVisible ) {
+                self.to_preview_mode ( );
+            }
+            return isVisible;
         };
 
         function on_button_prev ( ) {
@@ -134,7 +175,7 @@ var WGL = ( function ( params ) {
             }
 
             var span_step = RootContainer.getElementsByClassName ( 'step_' + player_step )[0];
-            cube.Move ( inverted_step, true, function ( ) {
+            core.Move ( inverted_step, true, function ( ) {
                 if ( typeof span_step !== 'undefined' ) {
                     span_step.classList.add ( 'current-step' );
                 }
@@ -156,8 +197,8 @@ var WGL = ( function ( params ) {
             player_forward = true;
             player_playing = false;
 
-            cube.Reset ( );
-            cube.Move ( player_init, false );
+            core.Reset ( );
+            core.Move ( player_init, false );
 
             var button_play = RootContainer.getElementsByClassName ( 'play-pause' )[0];
             button_play.classList.remove ( 'icon-pause' );
@@ -188,7 +229,7 @@ var WGL = ( function ( params ) {
 
                 var span_step = RootContainer.getElementsByClassName ( 'step_' + player_step )[0];
 
-                cube.Move ( player_steps [ player_step ], true, function ( ) {
+                core.Move ( player_steps [ player_step ], true, function ( ) {
                     if ( typeof span_step !== 'undefined' ) {
                         span_step.classList.add ( 'current-step' );
                     }
@@ -217,7 +258,7 @@ var WGL = ( function ( params ) {
 
             var span_step = RootContainer.getElementsByClassName ( 'step_' + player_step )[0];
 
-            cube.Move ( player_steps [ player_step ], true, function ( ) {
+            core.Move ( player_steps [ player_step ], true, function ( ) {
                 if ( typeof span_step !== 'undefined' ) {
                     span_step.classList.add ( 'current-step' );
                 }
