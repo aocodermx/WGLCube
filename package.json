@@ -2,17 +2,30 @@
   "name": "wglcube",
   "version": "1.0.0",
   "description": "Magic cube with WebGL",
-  "main": "wglcube_player.js",
+  "homepage": "http://aocodermx.me/projects/WGLCube/",
+  "main": "js/wglcube_V1.0.0.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "WebGL",
     "Magic",
-    "Cube"
+    "Cube",
+    "Threejs"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aocodermx/WGLCube.git"
+  },
+  "bugs": {
+    "email": "aocodermx@gmail.com",
+    "url": "https://github.com/aocodermx/WGLCube/issues"
+  },
   "author": "aocodermx",
-  "license": "ISC",
+  "contributors": {
+    "name": "aocodermx"
+  },
+  "license": "MIT",
   "devDependencies": {
     "browser-sync": "^2.17.5",
     "gulp": "^3.9.1",
