@@ -21,5 +21,8 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^2.0.0",
     "jshint": "^2.9.4"
+  },
+  "dependencies": {
+    "gulp-uglifycss": "^1.0.6"
   }
 }
