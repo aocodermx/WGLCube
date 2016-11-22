@@ -1,6 +1,6 @@
 {
   "name": "wglcube",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Magic cube with WebGL",
   "homepage": "http://aocodermx.me/projects/WGLCube/",
   "main": "js/wglcube_V1.0.0.min.js",
