@@ -56,12 +56,11 @@ var WGL = ( function ( params ) {
             div_controls.className  = "controls";
             div_hint.className      = "hint";
 
-            button_prev.innerHTML   = '&lt;&lt;';
-            button_stop.innerHTML   = '&#9726;';
-            button_play.innerHTML   = '&#9654;';
-            button_play.className   = 'play-pause';
-            button_next.innerHTML   = '&gt;&gt;';
-            button_close.innerHTML  = '&#9167;';
+            button_prev.className   = 'icon-previous';
+            button_stop.className   = 'icon-stop';
+            button_play.className   = 'play-pause icon-play';
+            button_next.className   = 'icon-next';
+            button_close.className  = 'icon-eject';
 
             for ( var i = 0; i < player_steps.length; i++ ) {
               var span_step       = document.createElement ( 'span' );
@@ -89,10 +88,10 @@ var WGL = ( function ( params ) {
             RootContainer.appendChild ( div_hint );
             RootContainer.appendChild ( div_controls );
 
-            var font_size = 1;
+            var font_size = 100;
             while ( div_step_list.scrollHeight != div_step_list.offsetHeight ) {
-                font_size -= 0.01;
-                div_step_list.style.fontSize = font_size + "em";
+                font_size -= 1;
+                div_step_list.style.fontSize = font_size + "px";
                 if ( font_size < 0.2 )
                     break;
             }
@@ -214,13 +213,11 @@ var WGL = ( function ( params ) {
 
                 var button_play = RootContainer.getElementsByClassName ( 'play-pause' )[0];
                 if ( player_playing ) {
-                    // button_play.classList.remove ( 'icon-play' );
-                    // button_play.classList.add    ( 'icon-pause' );
-                    button_play.innerHTML   = '&#9646;&#9646';
+                    button_play.classList.remove ( 'icon-play' );
+                    button_play.classList.add    ( 'icon-pause' );
                 } else {
-                    // button_play.classList.remove ( 'icon-pause' );
-                    // button_play.classList.add    ( 'icon-play' );
-                    button_play.innerHTML   = '&#9654;';
+                    button_play.classList.remove ( 'icon-pause' );
+                    button_play.classList.add    ( 'icon-play' );
                 }
             }
 

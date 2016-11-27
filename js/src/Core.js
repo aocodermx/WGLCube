@@ -112,7 +112,7 @@ var WGL = ( function ( params ) {
             cancelAnimationFrame ( animationFrameId );
             // TODO: Update threejs version used.
             // renderer.context.canvas.loseContext ( );
-            if ( renderer != null ) {
+            if ( renderer !== null ) {
                 renderer.forceContextLoss ( );
                 renderer = null;
                 camera   = null;
@@ -128,7 +128,7 @@ var WGL = ( function ( params ) {
         *    Function to reset the cube to the original position.
         */
         this.Reset = function (  ) {
-            if ( tween != null && animationRunning )
+            if ( tween !== null && animationRunning )
                 tween.stop ( );
             else
                 renderCube ( scene );
@@ -289,6 +289,8 @@ var WGL = ( function ( params ) {
             renderer  = window.WebGLRenderingContext ? new THREE.WebGLRenderer ( { antialias:true, preserveDrawingBuffer: true } ) : new THREE.CanvasRenderer ( );
             camera    = new THREE.PerspectiveCamera ( 45, CubeContainer.offsetWidth / ( CubeContainer.offsetHeight ), 0.1, 1000 );
             controls  = new THREE.OrbitControls ( camera, renderer.domElement );
+
+            console.log ( window.WebGLRenderingContext );
 
             controls.enablePan = false;
             renderer.setClearColor    ( 0xD8D8D8, 1 );

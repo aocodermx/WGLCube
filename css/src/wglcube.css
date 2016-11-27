@@ -61,9 +61,12 @@
     height:15%;
     bottom:15%;
     overflow:hidden;
+    padding-left:2em;
+    padding-right:2em;
 }
 
 .steps-container span {
+    font-size: 10em;
     margin-left:  2px;
     margin-right: 2px;
     float:left;
@@ -89,6 +92,8 @@
     height:100%;
     width:18%;
     font-size:1em;
+    background-repeat: no-repeat;
+    background-size:contain;
 }
 
 .current-step {
@@ -96,7 +101,29 @@
     /*font-size: 1.1em;*/
 }
 
+.icon-previous {
+    background-image: url('/img/icon-previous.svg');
+}
 
+.icon-stop {
+    background-image: url('/img/icon-stop.svg');
+}
+
+.icon-play {
+    background-image: url('/img/icon-play.svg');
+}
+
+.icon-pause {
+    background-image: url('/img/icon-pause.svg');
+}
+
+.icon-next {
+    background-image: url('/img/icon-next.svg');
+}
+
+.icon-eject {
+    background-image: url('/img/icon-eject.svg');
+}
 
 /*******************************************
  *                                         *
