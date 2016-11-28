@@ -14,6 +14,14 @@ var browserSync = require ( 'browser-sync' ).create ( );
 var json = JSON.parse ( fs.readFileSync ( './package.json' ) );
 
 
+gulp.task ( 'debug-css', function ( ) {
+    return gulp.src ( 'css/src/*.css' )
+        .pipe ( concat ( 'styles.css' ) )
+        .pipe ( css2js ( ) )
+        .pipe ( gulp.dest ( 'css' ) );
+} );
+
+
 gulp.task ( 'css', function ( ) {
     return gulp.src ( 'css/src/*.css' )
         .pipe ( base64 ( ) )
@@ -21,6 +29,16 @@ gulp.task ( 'css', function ( ) {
         .pipe ( concat ( 'styles.css' ) )
         .pipe ( css2js ( ) )
         .pipe ( gulp.dest ( 'css' ) );
+} );
+
+
+gulp.task ( 'debug-js', function ( ) {
+    return gulp.src ( ['js/src/*.js', 'css/styles.js'] )
+        .pipe ( jshint ( ) )
+        .pipe ( jshint.reporter ( 'default' ) )
+        .pipe ( concat ('wglcube.js' ) )
+        .pipe ( rename ( 'wglcube_V'+ json.version +'.min.js' ) )
+        .pipe ( gulp.dest ( 'js' ) );
 } );
 
 
@@ -42,13 +60,13 @@ gulp.task ( 'img', function ( ) {
 } );
 
 
-gulp.task ( 'js-watch', ['js'], function ( done ) {
+gulp.task ( 'js-watch', ['debug-js'], function ( done ) {
     browserSync.reload ( );
     done ( );
 } );
 
 
-gulp.task ( 'css-watch', ['css'], function ( done) {
+gulp.task ( 'css-watch', ['debug-css'], function ( done) {
     browserSync.reload ( );
     done ( );
 } );
@@ -71,5 +89,10 @@ gulp.task ( 'serve', function ( ) {
     gulp.watch ( "css/src/*.css",  [ 'css-watch' ] );
 });
 
-
-// TODO: Add a wglcube gulp.task with js and css task as dependencies..
+gulp.task ( 'build', ['img', 'css', 'js'], function ( ) {
+    return gulp.src ( ['js/lib/three.min.js', 'js/lib/Projector.min.js', 'js/lib/CanvasRenderer.min.js', 'js/lib/OrbitControls.min.js', 'js/lib/Tween.min.js', 'css/styles.js', 'js/src/*.js'] )
+        .pipe ( uglify ( ) ) // Comment to debug.
+        .pipe ( concat ('wglcube.js' ) )
+        .pipe ( rename ( 'wglcube_V'+ json.version +'.nodeps.min.js' ) )
+        .pipe ( gulp.dest ( 'js' ) );
+} );

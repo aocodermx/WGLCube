@@ -1,4 +1,4 @@
-var WGL = ( function ( params ) {
+var WGLCube = ( function ( params ) {
 
     /*
     *  Object to represent the 3D Cube, exposing an API to manipulate the cube.
@@ -18,7 +18,7 @@ var WGL = ( function ( params ) {
 
         // Public properties.
         self.size      = null; // Size for the cube
-        self.STEP_TIME = 750;  // Time for each single move
+        self.STEP_TIME = 200;  // Time for each single move
 
         var RootContainer = null;   // Root DOM Container
         var CubeArray     = [];     // Array to hold 3d cubes
@@ -54,6 +54,7 @@ var WGL = ( function ( params ) {
                 console.log ( 'data-size parameter needed in order to render cube.' );
                 return 0;
             }
+            self.STEP_TIME *= self.size;
 
             var CubesToShowString = RootContainer.getAttribute ( "data-show" );
             if ( CubesToShowString !== null) {
@@ -90,7 +91,7 @@ var WGL = ( function ( params ) {
             div_cube.classList.add    ( 'util-show' );
             // div_cube.style = 'display:block;';
 
-            // Load WGL
+            // Load WGLCube
             init3d ( );
         };
 
@@ -290,8 +291,6 @@ var WGL = ( function ( params ) {
             camera    = new THREE.PerspectiveCamera ( 45, CubeContainer.offsetWidth / ( CubeContainer.offsetHeight ), 0.1, 1000 );
             controls  = new THREE.OrbitControls ( camera, renderer.domElement );
 
-            console.log ( window.WebGLRenderingContext );
-
             controls.enablePan = false;
             renderer.setClearColor    ( 0xD8D8D8, 1 );
             renderer.setSize          ( CubeContainer.offsetWidth, CubeContainer.offsetHeight );
@@ -335,18 +334,21 @@ var WGL = ( function ( params ) {
                     new THREE.MeshBasicMaterial ( { color:0x848484 } )  // Back   -> Yellow
                 ] );
 
+            var a_border = Math.abs ( - self.size / 2 + 0.5 );
             for ( var z = -self.size / 2 + 0.5; z < self.size / 2; z++ ) {
                 for ( var x = -self.size / 2 + 0.5; x < self.size / 2; x++ ) {
                     for ( var y = -self.size / 2 + 0.5; y < self.size / 2; y++ ) {
                         var piece = null;
-                        if( CubesToShow.length !== 0 && CubesToShow.indexOf( CubeArray.length.toString() ) < 0 ){
-                            piece = new THREE.Mesh( geometry, blackMaterial );
-                        } else {
-                            piece = new THREE.Mesh( geometry, material );
+                        if ( Math.abs ( x ) === a_border || Math.abs ( y ) === a_border || Math.abs ( z ) === a_border ) {
+                            if( CubesToShow.length !== 0 && CubesToShow.indexOf( CubeArray.length.toString() ) < 0 ){
+                                piece = new THREE.Mesh( geometry, blackMaterial );
+                            } else {
+                                piece = new THREE.Mesh( geometry, material );
+                            }
+                            piece.position.set( x, y, z );
+                            CubeArray.push( piece );
+                            scene.add( piece );
                         }
-                        piece.position.set( x, y, z );
-                        CubeArray.push( piece );
-                        scene.add( piece );
                     }
                 }
             }
@@ -490,4 +492,4 @@ var WGL = ( function ( params ) {
     };
 
     return params;
-} ( WGL || { } ) );
+} ( WGLCube || { } ) );

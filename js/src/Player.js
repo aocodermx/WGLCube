@@ -1,4 +1,4 @@
-var WGL = ( function ( params ) {
+var WGLCube = ( function ( params ) {
 
     /*
     *  Object to represent an algorithm player to play, pause move forward or
@@ -33,7 +33,7 @@ var WGL = ( function ( params ) {
         function init ( dom_container ) {
             RootContainer = dom_container;
 
-            core         = new WGL.Core ( RootContainer );
+            core         = new WGLCube.Core ( RootContainer );
             player_init  =   RootContainer.getAttribute ( 'data-init' );
             player_steps = ( RootContainer.getAttribute ( 'data-steps' ) ).split( ' ' );
             if ( player_steps === null ) {
@@ -274,4 +274,4 @@ var WGL = ( function ( params ) {
     };
 
     return params;
-} ( WGL || { } ) );
+} ( WGLCube || { } ) );

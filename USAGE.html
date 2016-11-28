@@ -100,7 +100,7 @@
                 </td>
                 <td>
                     <div class="wglcube_player"
-                        data-size="4"
+                        data-size="15"
                         data-init="L U D"
                         data-steps="D U L D R2"
                         style="width:200px;height:300px"></div>
@@ -112,9 +112,15 @@
 
     <!-- Dependencies for WGLCube -->
     <script src="js/lib/three.min.js"></script>
+    <script src="js/lib/Projector.js"></script>
+    <script src="js/lib/CanvasRenderer.min.js"></script>
     <script src="js/lib/OrbitControls.min.js"></script>
     <script src="js/lib/Tween.min.js"></script>
 
     <script src="js/wglcube_V1.0.1.min.js"></script> <!-- or wglcube_player.min.js for better performance -->
+
+    <!-- Dependencies included in one single file, recomended only if you are not using THREEJS in your project
+    <script src="js/wglcube_V1.0.1.nodeps.min.js"></script>
+    -->
   </body>
 </html>

@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Magic cube with WebGL",
   "homepage": "http://aocodermx.me/projects/WGLCube/",
-  "main": "js/wglcube_V1.0.0.min.js",
+  "main": "js/wglcube_V1.0.1.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

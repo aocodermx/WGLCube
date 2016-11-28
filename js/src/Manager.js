@@ -1,4 +1,4 @@
-var WGL = ( function ( params ) {
+var WGLCube = ( function ( params ) {
 
     /*
     *   Manager to find and load all cubes, and change it's mode to preview if
@@ -13,7 +13,7 @@ var WGL = ( function ( params ) {
                 dom_players = document.getElementsByClassName ( 'wglcube_player' );
 
             for ( var i = 0; i< dom_players.length; i++ ) {
-                players.push ( new WGL.Player ( dom_players[i] ) );
+                players.push ( new WGLCube.Player ( dom_players[i] ) );
             }
 
             window.addEventListener('scroll', function ( e ) {
@@ -30,11 +30,11 @@ var WGL = ( function ( params ) {
     };
 
     return params;
-} ( WGL || { } ) );
+} ( WGLCube || { } ) );
 
 // Code for a smallest ready implementation from http://dustindiaz.com/smallest-domready-ever
 function r(f){/in/.test(document.readyState)?setTimeout('r('+f+')',9):f();}
 
 r ( function ( ) {
-    var WGLCube = new WGL.Manager ( );
+    var wglManager = new WGLCube.Manager ( );
 } );
