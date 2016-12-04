@@ -22,7 +22,6 @@ var WGLCube = ( function ( params ) {
         var core           = null;
         var RootContainer  = null;
 
-        var player_preview = true;
         var player_step    = 0;
         var player_init    = null;
         var player_steps   = null;
@@ -40,8 +39,6 @@ var WGLCube = ( function ( params ) {
                 console.log ( 'data-steps needed in order to display an algorithm execution.' );
             }
 
-            // core.STEP_TIME = 2500; // For test pruporses.
-
             var div_step_list = document.createElement ( 'div'    );
             var div_controls  = document.createElement ( 'div'    );
             var div_hint      = document.createElement ( 'div'    );
@@ -50,7 +47,6 @@ var WGLCube = ( function ( params ) {
             var button_stop   = document.createElement ( 'button' );
             var button_play   = document.createElement ( 'button' );
             var button_next   = document.createElement ( 'button' );
-            var button_close  = document.createElement ( 'button');
 
             div_step_list.className = "steps-container";
             div_controls.className  = "controls";
@@ -60,7 +56,6 @@ var WGLCube = ( function ( params ) {
             button_stop.className   = 'icon-stop';
             button_play.className   = 'play-pause icon-play';
             button_next.className   = 'icon-next';
-            button_close.className  = 'icon-eject';
 
             for ( var i = 0; i < player_steps.length; i++ ) {
               var span_step       = document.createElement ( 'span' );
@@ -75,14 +70,15 @@ var WGLCube = ( function ( params ) {
             button_stop.addEventListener   ( 'click', on_button_stop );
             button_play.addEventListener   ( 'click', on_button_play );
             button_next.addEventListener   ( 'click', on_button_next );
-            button_close.addEventListener  ( 'click', self.to_preview_mode );
-            RootContainer.addEventListener ( 'click', self.to_interactive_mode );
+
+            div_step_list.onresize = function ( ) {
+                console.log ( "div_step_list resized" );
+            };
 
             div_controls.appendChild  ( button_prev  );
             div_controls.appendChild  ( button_stop  );
             div_controls.appendChild  ( button_play  );
             div_controls.appendChild  ( button_next  );
-            div_controls.appendChild  ( button_close );
 
             RootContainer.appendChild ( div_step_list );
             RootContainer.appendChild ( div_hint );
@@ -98,7 +94,6 @@ var WGLCube = ( function ( params ) {
         }
 
         this.to_interactive_mode = function ( e ) {
-            player_preview = false;
 
             var div_controls = RootContainer.getElementsByClassName ( 'controls' )[0];
             div_controls.classList.remove ( 'util-hide' );
@@ -121,7 +116,6 @@ var WGLCube = ( function ( params ) {
         };
 
         this.to_preview_mode = function ( e ) {
-            player_preview = true;
 
             var div_controls = RootContainer.getElementsByClassName ( 'controls' )[0];
             div_controls.classList.remove ( 'util-show' );
@@ -138,26 +132,16 @@ var WGLCube = ( function ( params ) {
             RootContainer.classList.add    ( 'util-cursor-hand' );
 
             core.to_preview_mode ( );
-            RootContainer.addEventListener ( 'click', self.to_interactive_mode );
 
             if ( typeof e !== 'undefined')
                 e.cancelBubble = true;
         };
 
-        this.isPreview = function ( ) {
-            return player_preview;
-        };
-
-        this.isScrolledIntoView = function ( ) {
+        this.isVisible = function ( ) {
             var elemTop    = RootContainer.getBoundingClientRect().top;
             var elemBottom = RootContainer.getBoundingClientRect().bottom;
 
-            var isVisible = (elemBottom >= 0) && (elemTop <= window.innerHeight);
-
-            if ( !isVisible ) {
-                self.to_preview_mode ( );
-            }
-            return isVisible;
+            return (elemBottom >= 0) && (elemTop <= window.innerHeight);
         };
 
         function on_button_prev ( ) {

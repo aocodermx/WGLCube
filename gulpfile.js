@@ -1,6 +1,7 @@
 var fs        = require ( 'fs' );
 var gulp      = require ( 'gulp' );
 var jshint    = require ( 'gulp-jshint' );
+var csslint   = require ( 'gulp-csslint');
 var concat    = require ( 'gulp-concat' );
 var rename    = require ( 'gulp-rename' );
 var base64    = require ( 'gulp-base64' );
@@ -16,6 +17,8 @@ var json = JSON.parse ( fs.readFileSync ( './package.json' ) );
 
 gulp.task ( 'debug-css', function ( ) {
     return gulp.src ( 'css/src/*.css' )
+        .pipe ( csslint ( ) )
+        .pipe ( csslint.formatter ( ) )
         .pipe ( concat ( 'styles.css' ) )
         .pipe ( css2js ( ) )
         .pipe ( gulp.dest ( 'css' ) );
@@ -91,7 +94,7 @@ gulp.task ( 'serve', function ( ) {
 
 gulp.task ( 'build', ['img', 'css', 'js'], function ( ) {
     return gulp.src ( ['js/lib/three.min.js', 'js/lib/Projector.min.js', 'js/lib/CanvasRenderer.min.js', 'js/lib/OrbitControls.min.js', 'js/lib/Tween.min.js', 'css/styles.js', 'js/src/*.js'] )
-        .pipe ( uglify ( ) ) // Comment to debug.
+        // .pipe ( uglify ( ) ) // Comment to debug.
         .pipe ( concat ('wglcube.js' ) )
         .pipe ( rename ( 'wglcube_V'+ json.version +'.nodeps.min.js' ) )
         .pipe ( gulp.dest ( 'js' ) );

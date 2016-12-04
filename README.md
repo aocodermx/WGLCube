@@ -2,7 +2,7 @@
 
 WGLCube is a 3D representation for the magic cube you can use to demonstrate and execute algorithms natively just in the browser without need jvm or flash.
 
-This plug-in is written in Javascript using the great library threejs to access browser WebGL context.
+![alt tag](https://raw.githubusercontent.com/aocodermx/WGLCube/master/img/ScreenShoot.png)
 
 ## Simple Installation
 
@@ -12,7 +12,7 @@ The *nodeps* script contains all the dependencies minified in one single file an
 
 ``` html
 <!-- WGLCube single file with all dependencies already included -->
-<script src="js/wglcube_V1.0.1.nodeps.min.js"></script>
+<script src="js/wglcube_V1.0.2.nodeps.min.js"></script>
 ```
 
 ## Installation with dependencies
@@ -30,7 +30,7 @@ You just need to copy the WGLCube JavaScrip dependencies and the plug-in itself 
 <script src="js/lib/Tween.min.js"></script>
 
 <!-- WGLCube without dependencies -->
-<script src="js/wglcube_V1.0.1.min.js"></script>
+<script src="js/wglcube_V1.0.2.min.js"></script>
 ```
 
 ## Usage Example
@@ -41,7 +41,7 @@ Once WGLCube was installed in your website you are ready to show and execute an 
     data-size="3"
     data-init="L U D"
     data-steps="D U L D R2"
-    style='width:200px;height:300px'>
+    style="width:200px;height:300px">
 </div>
 ```
 
